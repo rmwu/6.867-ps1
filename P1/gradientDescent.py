@@ -40,6 +40,43 @@ def update(n, Theta, Y, x, eta):
 # Mathematical Implementations
 ##################################
 
+def d_negative_gaussian(Sigma, x, mu):
+	"""
+	d_negative_gaussian(Sigma, x, mu) calculates the derivative
+	of a negative gaussian function, which has the form:
+
+		f(x) = [math]
+
+	Parameters
+		Sigma	covariance matrix
+		x		x is x
+		mu		mean
+	"""
+	pass
+
+def d_quadratic_bowl(A, x, b):
+	"""
+	d_quadratic_bowl(A, x, b) calculates the derivative of a 
+	quadratic bowl, which has the form:
+
+		f(x) = 1/2 xT Ax - xT b
+
+	Parameters
+		A		positive definite matrix
+		x
+		b
+	"""
+	return A.dot(x) - b
+
+def gradient_approximation(x, delta):
+	"""
+	gradient_approximation(x, delta, etc.) numerically approximates
+	the gradient at a certain point.
+
+	not sure what we need yet
+	"""
+	pass
+
 ##################################
 # Input Handling
 ##################################
