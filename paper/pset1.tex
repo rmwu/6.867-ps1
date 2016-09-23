@@ -1,21 +1,112 @@
-\documentclass[twocolumn]{amsart}
+\documentclass{amsart}
+\usepackage[nosetup]{tony}
 
-\title{TITLE HERE}
-%\date{}
+\title{TITLE HERE} % #PLACEHOLDER
+\date{September 29, 2016}
 
 \begin{document}
+
+\begin{abstract}
+% #PLACEHOLDER
+MY ABSTRACT HERE summary summary
+\end{abstract}
+
 \maketitle
 
-\section{My first section}
 
-lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
 
-lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum  
 
-\section{My second section}
+% % % % % % % % % %
+%    PROBLEM 1
+% % % % % % % % % %
 
-lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum 
+\section{Gradient Descent}
 
-%\subsection{}
+\subsection{Batch Gradient Descent}
 
-\end{document}  
+We implemented a general-purpose batch gradient descent as described in Bishop, section 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion. % TODO elaborate on this?
+We tested our implementation against two functions: a sign-reversed multivariate Gaussian with mean~$\mu$ and covariance matrix~$\Sigma$
+\begin{equation}
+f(x; \mu, \Sigma) = -\frac{1}{\sqrt{(2\pi)^n \det\Sigma}}\exp\left( -\frac12(x - \mu)^T \Sigma^{-1}(x - \mu) \right)
+\end{equation}
+and a quadratic bowl
+\begin{equation}
+f(x; A, b) = \frac{1}{2}x^T Ax - x^T b,
+\end{equation}
+where $A$ is positive-definite.
+
+% TODO Do something with this
+% For the Gaussian, we had $\mu = (10, 10)^T$, $\Sigma = \left(\begin{array}{cc}1000 & 0 \\0 & 1000\end{array}\right)$. For the quadratic bowl, we had $A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)$ and $b = (400, 400)^T$.
+
+% #PLACEHOLDER
+% TODO
+% present results of experiments
+% "Discuss (and illustrate) the effect of the choice of starting guess, the step size, and the convergence criterion on the resulting solution, as well as how the 
+
+\subsection{Numerical Gradient Approximation}
+
+Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. With our examples, these gradients had simple analyic forms, but such is not the case for general objective functions. Therefore, as a check on the user-specified gradient (or as a substitute for a user-specified gradient), we implemented a gradient approximation routine.
+
+Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at some given point~$x^*$ by approximating its partial derivatives as
+\begin{equation}
+\f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
+\end{equation}
+where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this quantity for each dimension of our domain and collect each value into our numerical gradient approximation.
+
+% #PLACEHOLDER
+% TODO
+% "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
+
+
+\subsection{Stochastic Gradient Descent}
+
+By design, batch gradient descent takes the 
+
+% #PLACEHOLDER
+
+rem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum 
+
+
+
+% % % % % % % % % %
+%    PROBLEM 2
+% % % % % % % % % %
+
+\section{Linear Regression}
+
+% #PLACEHOLDER
+
+rem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lor
+
+em ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+
+
+
+% % % % % % % % % %
+%    PROBLEM 3
+% % % % % % % % % %
+
+\section{Ridge Regression}
+
+% #PLACEHOLDER
+
+rem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+
+
+
+% % % % % % % % % %
+%    PROBLEM 4
+% % % % % % % % % %
+
+\section{Sparsification with LASSO}
+
+% #PLACEHOLDER
+lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lo
+
+lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lore
+
+m ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum  
+
+\end{document}
