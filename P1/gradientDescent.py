@@ -4,6 +4,8 @@ Problem 1. Implement Gradient Descent
 """
 
 import numpy as np
+import loadFittingDataP1 as loadData
+import loadParametersP1 as loadParams
 
 ##################################
 # Main Functions
@@ -81,12 +83,17 @@ def gradient_approximation(x, delta):
 # Input Handling
 ##################################
 
-def get_inputs(filename):
+def get_inputs():
 	"""
-	get_inputs reads the input values from the file at
-	filename
+	get_inputs reads the input values from the data file.
 	"""
-	pass
+	return loadData.getData()
+
+def get_params():
+	"""
+	get_inputs reads the input values from the params file.
+	"""
+	return loadParams.getData()
 
 def main():
 	"""
