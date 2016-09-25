@@ -7,7 +7,33 @@ from __future__ import division
 import numpy as np
 import math
 
+import loadFittingDataP1 as loadData
+import loadParametersP1 as loadParams
+
 debug = True
+
+##################################
+# Input Handling
+##################################
+
+def get_gaussian_params():
+    mu, sigma = loadParams.getData()[:2]
+    mu = np.array(mu).reshape(2, 1)
+    sigma = np.array(sigma)
+
+    return (mu, Sigma)
+
+def get_quad_params():
+    a, b = loadParams.getData()[2:4]
+    b = np.array(b).reshape(2, 1)
+    a = np.array(a)
+
+    return (a, b)
+
+def get_data():
+    x, y = loadData.getData()
+    x, y = np.array(x, dtype='float64').reshape(100, 10), np.array(y).reshape(100, 1)
+    return (x, y)
 
 ##################################
 # Main Functions
@@ -146,7 +172,7 @@ def d_negative_gaussian(params, x):
         n           number of samples
         x           current vector
     """
-    mu, sigma = params
+    mu, sigma = get_gaussian_params()
     n = sigma.shape[0]
 
     f_x = negative_gaussian(params, mu)
@@ -159,15 +185,15 @@ def negative_gaussian(params, x):
     function given inputs.
 
     Parameters
-        params      contains (mu, Sigma)
+        params      contains (mu, sigma)
         x           current vector
     """
-    mu, Sigma = params
-    n = Sigma.shape[0]
+    mu, sigma = params # get_gaussian_params()
+    n = sigma.shape[0]
 
-    gaussian_normalization = 1/(math.sqrt((2*math.pi)**n * np.linalg.det(Sigma)))
+    gaussian_normalization = 1/(math.sqrt((2*math.pi)**n * np.linalg.det(sigma)))
     
-    exponent = -1/2 * (x - mu).T.dot(np.linalg.inv(Sigma)).dot(x - mu)
+    exponent = -1/2 * (x - mu).T.dot(np.linalg.inv(sigma)).dot(x - mu)
 
     return -1 * gaussian_normalization * math.exp(exponent)
 
@@ -230,7 +256,18 @@ def squared_error(params, theta):
     """
     x, y = params
 
-    return np.linalg.norm(x.dot(theta) - y) ** 2
+    return np.linalg.norm(x.dot(theta) - y.reshape(n, 1)) ** 2
+
+def d_stochastic_error(theta, xi, yi):
+    return 2 * stochastic_error(theta, xi, yi) * xi
+
+def stochastic_error(theta, xi, yi):
+    """
+    xi is 10 by 1
+    yi is 1 by 1
+    theta is 10 by 1
+    """
+    return (xi.reshape(1, 10).dot(theta)-yi) ** 2
 
 # estimation and loss funtions
 
