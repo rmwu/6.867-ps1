@@ -3,9 +3,7 @@
 Problem 1. Implement Gradient Descent
 """
 from __future__ import division
-
 import numpy as np
-
 from math_functions import *
 
 debug = False
@@ -14,7 +12,8 @@ debug = False
 # Main Functions
 ##################################
 
-def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by_grad):
+def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by_grad,
+                     stochastic = False):
     """
     gradient_descent
 
@@ -27,21 +26,37 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
         threshold   convergence threshold
         delta       numerical gradient estimate
         conv_by_grad true if converge by grad norm, false otherwise
+        stochastic  true if stochastic updates, false by default
     """
     iterations = 0 # counter
     current_x = x_init # this one is updated
+    n = x_init.shape[0]
 
     fx0 = 0 # last f(x)
     fx1 = float("inf") # current f(x)
 
     while True:
-        current_x, grad = update(gradient, current_x, eta)
+        i = iterations % n
+        t = iterations # t, as in handout
+
+        if stochastic:
+            current_x, grad = update(gradient, current_x, eta, i, t)
+        else:
+            current_x, grad = update(gradient, current_x, eta)
+
         current_norm = np.linalg.norm(grad)
 
         # estimate gradient norm, gradient
-        est_slope, est_grad = central_difference(objective, current_x, delta)
+        if stochastic:
+            est_slope, est_grad = central_difference(objective, current_x, delta, i)
+        else:
+            est_slope, est_grad = central_difference(objective, current_x, delta)
         # calculate objective function
-        fx1 = objective(current_x)
+
+        if stochastic:
+            fx1 = objective(current_x, i)
+        else:
+            fx1 = objective(current_x)
 
         if debug:
             print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated gradient: {}"\
@@ -64,17 +79,23 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
 
     return (current_x, fx1)
 
-def update(gradient, x, eta):
+def update(gradient, x, eta, i = None, t = None):
     """
-    update(gradient, n, current_x, eta) returns the
+    update(gradient, n, current_x, eta, i) returns the
     new x value after updating.
 
     Parameters
         gradient    gradient function
         x           vector to be updated
         eta         constant step size
+        i           optional, to specify stochastic
     """
-    grad = gradient(x)
+    if i is not None:
+        grad = gradient(x, i)
+        eta = (eta + t) ** (-0.75) # adjust learning rate
+    else:
+        grad = gradient(x)
+
     x_new = x - eta * grad
 
     return (x_new, grad)
@@ -83,7 +104,7 @@ def update(gradient, x, eta):
 # Estimations
 ##################################
 
-def central_difference(f, x, delta):
+def central_difference(f, x, delta, i = None):
     """
     central_difference(f, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
@@ -99,8 +120,14 @@ def central_difference(f, x, delta):
         new_x_pos = x + delta_matrix[i].reshape(n, 1)
         new_x_neg = x - delta_matrix[i].reshape(n, 1)
 
-        f_pos = f(new_x_pos)
-        f_neg = f(new_x_neg)
+        if i is not None:
+            f_pos = f(new_x_pos, i)
+            f_neg = f(new_x_neg, i)
+        else:
+            f_pos = f(new_x_pos)
+            f_neg = f(new_x_neg)
+
+        # print(f_pos - f_neg)
 
         est_gradient.append((f_pos - f_neg) / delta)
 

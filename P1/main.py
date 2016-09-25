@@ -40,6 +40,15 @@ def test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     gradient_descent(theta_init, squared_error, d_squared_error,
                     eta, threshold, delta, conv_by_grad)
 
+def test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
+    """
+    omg it converged for eta = 0.000001
+    """
+    theta_init = np.array([0 for i in range(10)]).reshape(10, 1)
+
+    gradient_descent(theta_init, stochastic_error, d_stochastic_error,
+                    eta, threshold, delta, conv_by_grad, True)
+
 def usage():
     raise ValueError("sys.argv must contain:\n'guass' or 'quad'\neta\nthreshold")
 
@@ -66,7 +75,7 @@ def main():
         raise ValueError("must specify 'gauss' or 'quad'")
 
     # simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta)
-    test_batch_gradient_descent(conv_by_grad, eta, threshold, delta)
+    test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
 
 if __name__ == "__main__":
     if debug:

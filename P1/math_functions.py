@@ -9,7 +9,7 @@ import loadFittingDataP1 as loadData
 import loadParametersP1 as loadParams
 
 ##################################
-# Input Handling
+# Input handling
 ##################################
 
 def get_gaussian_params():
@@ -34,6 +34,10 @@ def get_data():
 mu, sigma = get_gaussian_params()
 a, b = get_quad_params()
 x_data, y_data = get_data()
+
+##################################
+# Mathematical Implementations
+##################################
 
 def d_negative_gaussian(x):
     """
@@ -116,8 +120,7 @@ def squared_error(theta):
     return np.linalg.norm(x_data.dot(theta) - y_data) ** 2
 
 def d_stochastic_error(theta, i):
-
-    return 2 * stochastic_error(theta, i) * x[i].reshape(10, 1)
+    return 2 * stochastic_error(theta, i) * x_data[i].reshape(10, 1)
 
 def stochastic_error(theta, i):
     """
@@ -127,8 +130,8 @@ def stochastic_error(theta, i):
 
     where t represents the iteration, and i represents the sample index
     """
-    xiT = x[i].reshape(1, 10)
-    yi = y[i].reshape(10, 1)
+    xiT = x_data[i].reshape(10, 1).T
+    yi = y_data[i][0]
 
-    return (xiT.dot(theta)-yi) ** 2
+    return (xiT.dot(theta.reshape(10, 1))[0][0]-yi) ** 2
 
