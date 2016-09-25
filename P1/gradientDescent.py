@@ -45,13 +45,13 @@ def gradient_descent(x_init, params, loss, function, gradient,
 
     while True:
         # update step
-        current_x, grad = update(gradient, params, n, current_x, eta)
+        current_x, grad = update(gradient, params, current_x, eta)
         current_norm = np.linalg.norm(grad)
 
         # estimate gradient norm, gradient
-        est_slope, est_grad = central_difference(function, params, n, current_x, delta)
+        est_slope, est_grad = central_difference(function, params, current_x, delta)
         # calculate objective function
-        fx1 = function(params, n, current_x)
+        fx1 = function(params, current_x)
 
         print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated gradient: {}"\
             .format(current_norm, current_x, fx1, est_grad))
@@ -72,7 +72,7 @@ def gradient_descent(x_init, params, loss, function, gradient,
     return (current_x, fx1)
 
 
-def update(gradient, params, n, x, eta):
+def update(gradient, params, x, eta):
     """
     update(gradient, params, n, current_x, eta) returns the
     new x value after updating.
@@ -80,11 +80,10 @@ def update(gradient, params, n, x, eta):
     Parameters
         gradient    gradient function
         param       parameters
-        n           number of samples
         x           vector to be updated
         eta         constant step size
     """
-    grad = gradient(params, n, x)
+    grad = gradient(params, x)
     x_new = x - eta * grad
 
     print("\nupdating x from\n{}\nto\n{}\n".format(x, x_new))
@@ -99,9 +98,9 @@ def update(gradient, params, n, x, eta):
 
 # gradient computing functions
 
-def d_negative_gaussian(params, n, x):
+def d_negative_gaussian(params, x):
     """
-    d_negative_gaussian(params, n, x) calculates the derivative
+    d_negative_gaussian(params, x) calculates the derivative
     of a negative gaussian function, which has the form:
 
         f(x) = [math]
@@ -112,21 +111,23 @@ def d_negative_gaussian(params, n, x):
         x           current vector
     """
     mu, sigma = params
+    n = Sigma.shape[0]
+
     f_x = negative_gaussian(params, n, mu)
 
     return -f_x * np.linalg.inv(sigma).dot(x - mu)
 
-def negative_gaussian(params, n, x):
+def negative_gaussian(params, x):
     """
-    negative_gaussian(params, n, x) calculates the negative gaussian
+    negative_gaussian(params, x) calculates the negative gaussian
     function given inputs.
 
     Parameters
         params      contains (mu, Sigma)
-        n           number of samples
         x           current vector
     """
     mu, Sigma = params
+    n = Sigma.shape[0]
 
     gaussian_normalization = 1/(math.sqrt((2*math.pi)**n * np.linalg.det(Sigma)))
     
@@ -134,29 +135,27 @@ def negative_gaussian(params, n, x):
 
     return -1 * gaussian_normalization * math.exp(exponent)
 
-def d_quadratic_bowl(params, n, x):
+def d_quadratic_bowl(params, x):
     """
-    d_quadratic_bowl(params, n, x) calculates the derivative of a 
+    d_quadratic_bowl(params, x) calculates the derivative of a 
     quadratic bowl, which has the form:
 
         f(x) = 1/2 xT Ax - xT b
 
     Parameters
         params      contains (A, b)
-        n           number of samples
         x           current vector
     """
     A, b = params
     return A.dot(x) - b
 
-def quadratic_bowl(params, n, x):
+def quadratic_bowl(params, x):
     """
-    quadratic_bowl(A, x, b) calculates the quadratic bowl function for given
+    quadratic_bowl(params, b) calculates the quadratic bowl function for given
     A, x, and b.
 
     Parameters
         params      contains (A, b)
-        n           number of samples
         x           current vector
     """
     A, b = params
@@ -173,13 +172,15 @@ def least_square_error(X, Theta, y):
     """
     pass
 
-def central_difference(f, params, n, x, delta):
+def central_difference(f, params, x, delta):
     """
-    central_difference(f, params, n, x, delta) calculates an approximation of the gradient
+    central_difference(f, params, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
 
         (f(x + delta/2) - f(x - delta/2)) / delta
     """
+    n = params[0].shape[0]
+
     # numpy should fix dimensions
     f_positiveDelta = f(params, n, x + delta/2)
     f_negativeDelta = f(params, n, x - delta/2)
