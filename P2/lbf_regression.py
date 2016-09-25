@@ -1,30 +1,24 @@
 import sys
+sys.path.append("..")
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import P1.gradientDescent as gd
 import loadFittingDataP2 as lfd
 
-def powers(x, degree):
-    """
-    :param: x: a real number
-    :param: degree: a nonnegative integer
-    :return: the list [1, x, x^2, ..., x^degree]
-    """
-    # check preconditions
-    if type(degree) is not int:
-        raise TypeError("degree must be integer")
-    if degree < 0:
-        raise ValueError("degree must be nonnegative integer")
-
-    return [x**power for power in range(degree + 1)]
-    
 
 def power_basis(degree):
     def power_func(k):
         return lambda x: x**k
     return [power_func(k) for k in range(degree+1)]
+
+
+def cosine_basis(degree):
+    def cosine_func(k):
+        return lambda x: math.cos(k*math.pi*x)
+    return [cosine_func(k) for k in range(degree+1)]
 
 
 def basis_fit(X, Y, basis_functions):
@@ -40,27 +34,6 @@ def basis_fit(X, Y, basis_functions):
 
     assert len(max_likelihood_weights) == len(basis_functions)
     return max_likelihood_weights
-
-
-def polynomial_basis_fit(X, Y, fit_degree):
-    return basis_fit(X, Y, power_basis(fit_degree))
-
-
-def cosines(x, degree):
-    """
-    :return: cosines [cos(pi x), cos(2pi x), ..., cos(degree*pi x)]
-    """
-    return np.cos(np.arange(1, degree+1) * math.pi * x)
-
-
-def cosine_basis(degree):
-    def cosine_func(k):
-        return lambda x: math.cos(k*math.pi*x)
-    return [cosine_func(k) for k in range(1, degree+1)]
-
-
-def cosine_basis_fit(X, Y, fit_degree):
-    return basis_fit(X, Y, cosine_basis(fit_degree))
 
 
 def basis_fit_plot(X, Y, basis_functions, x_arange, **kwargs):
@@ -82,34 +55,6 @@ def design_matrix(basis_functions, X):
      ...]
     """
     return [[f(x) for f in basis_functions] for x in X]
-
-
-def poly_basis_square_sum_error(weight_vector, X, Y):
-    """
-    Squared sum error, given a weight vector from a polynomial basis fit
-    """
-    degree = len(weight_vector) - 1
-    return square_sum_error(design_matrix(power_basis(degree), X), Y)
-
-
-def poly_basis_square_sum_error_grad(weight_vector, X, Y):
-    """
-    Gradient of squared sum error, given a weight vector from a poly basis fit
-    """
-    assert len(Y.shape) == 2
-    assert Y.shape[1] == 1
-    degree = len(weight_vector) - 1
-    phi = design_matrix(power_basis(degree))
-    return phi.T.dot(phi.dot(weight_vector) - Y)
-
-
-def square_sum_error(y_guess, y_actual):
-    """
-    Sum of squares error, Bishop Equation 3.12.
-    :return: 1/2 * sum of squared errors.
-    """
-    error_vec = y_guess - y_actual
-    return 1/2 * error_vec.T.dot(error_vec)
 
 
 def main():
