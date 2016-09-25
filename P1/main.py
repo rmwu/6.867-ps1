@@ -30,7 +30,7 @@ def get_params():
 # Part Testing
 ##################################
 
-def test_part1(is_gaussian, conv_grad_norm, eta, threshold):
+def test_gradient_descent(is_gaussian, conv_grad_norm, eta, threshold, delta = 0.05):
     """
     Parameters
         is_gaussian     True if use gaussian, False for quad bowl
@@ -51,30 +51,7 @@ def test_part1(is_gaussian, conv_grad_norm, eta, threshold):
     gradient = d_negative_gaussian if is_gaussian else d_quadratic_bowl
 
     x_init = np.random.rand(2, 1)
-    x_init = np.array([[9.999], [9.99]])
-
-    gradient_descent(x_init, params, least_square_error, function, gradient, 
-                     eta, threshold, conv_grad_norm)
-
-def test_part2(is_gaussian, conv_grad_norm):
-    """
-    Parameters
-        is_gaussian     True if use gaussian, False for quad bowl
-        conv_grad_norm  True if we converge by gradient norm, False for
-                        change in loss(x)
-    """
-    delta = 0.05
-
-    mu, Sigma, A, b = get_params()
-
-    eta = 3
-    threshold = 1e-10
-    params = (mu, Sigma) if is_gaussian else (A, b)
-    function = negative_gaussian if is_gaussian else quadratic_bowl
-    gradient = d_negative_gaussian if is_gaussian else d_quadratic_bowl
-
-    x_init = np.random.rand(2, 1)
-    x_init = np.array([100, 100])
+    x_init = np.array([[9], [9]])
 
     gradient_descent(x_init, params, least_square_error, function, gradient, 
                      eta, threshold, conv_grad_norm, delta)
@@ -83,23 +60,30 @@ def usage():
     raise ValueError("sys.argv must contain:\n'guass' or 'quad'\neta\nthreshold")
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) < 4:
         usage()
 
+    # retrieve args
     func_name, eta, threshold = sys.argv[1:4]
+
+    if len(sys.argv) == 5:
+        delta = sys.argv[4]
+    else:
+        delta = 0.05
+
     eta, threshold = float(eta), float(threshold)
 
     print("eta: {}\nthreshold: {}".format(eta, threshold))
 
     is_gaussian = False
-    conv_grad_norm = True
+    conv_grad_norm = False
 
     if func_name == 'gauss':
         is_gaussian = True
     elif func_name != 'quad':
         raise ValueError("must specify 'gauss' or 'quad'")
 
-    test_part1(is_gaussian, conv_grad_norm, eta, threshold)
+    test_gradient_descent(is_gaussian, conv_grad_norm, eta, threshold, delta)
 
 if __name__ == "__main__":
     if debug:

@@ -38,26 +38,38 @@ def gradient_descent(x_init, params, loss, function, gradient,
     n, m = x_init.shape
 
     current_x = x_init
-    current_loss = 0
+    fx0 = 0 # last f(x)
+    fx1 = float("inf") # current f(x)
+
+    iterations = 0 # count iterations until converge
 
     while True:
+        # update step
         current_x, grad = update(gradient, params, n, current_x, eta)
         current_norm = np.linalg.norm(grad)
 
-        est_norm = central_difference(function, params, n, current_x, delta)
-        # update current_loss
+        # estimate gradient norm, gradient
+        est_slope, est_grad = central_difference(function, params, n, current_x, delta)
+        # calculate objective function
+        fx1 = function(params, n, current_x)
 
-        print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}"\
-            .format(current_norm, current_x, function(params, n, current_x)))
+        print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated gradient: {}"\
+            .format(current_norm, current_x, fx1, est_grad))
+        print("Past objective function: {}\n".format(fx0))
 
+        # check for convergence
         if grad_norm and converge_grad_norm(grad, threshold):
             break
 
-        elif not grad_norm and converge_delta_fx(prev_loss, current_loss, threshold):
+        elif not grad_norm and converge_delta_fx(fx0, fx1, threshold):
             break
-        # update previous loss
+        
+        # update "past" objective function
+        fx0 = fx1
+        iterations += 1
 
-    return (current_x, current_loss)
+    print("Converged after {} iterations\n".format(iterations))
+    return (current_x, fx1)
 
 
 def update(gradient, params, n, x, eta):
@@ -169,7 +181,15 @@ def central_difference(f, params, n, x, delta):
         (f(x + delta/2) - f(x - delta/2)) / delta
     """
     # numpy should fix dimensions
-    return (f(params, n, x + delta/2) - f(params, n, x - delta/2)) / delta
+    f_positiveDelta = f(params, n, x + delta/2)
+    f_negativeDelta = f(params, n, x - delta/2)
+
+    est_slope = (f_positiveDelta - f_negativeDelta) / delta
+
+    est_grad = np.array([[delta],[f_positiveDelta -  f_negativeDelta]])
+    est_grad = (est_grad / np.linalg.norm(est_grad)) * est_slope
+
+    return (est_slope, est_grad)
 
 def converge_grad_norm(grad, threshold):
     """
