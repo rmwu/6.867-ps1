@@ -79,8 +79,7 @@ def gradient_descent(x_init, params, function, gradient,
         current_norm = np.linalg.norm(grad)
 
         # estimate gradient norm, gradient
-        # est_slope, est_grad = central_difference(function, params, current_x, delta)
-        est_slope, est_grad = 0, 0
+        est_slope, est_grad = my_central_difference(function, params, current_x, delta)
         # calculate objective function
         fx1 = function(params, current_x)
 
@@ -235,23 +234,54 @@ def squared_error(params, theta):
 
 # estimation and loss funtions
 
-def central_difference(f, params, x, delta):
+def my_central_difference(f, params, x, delta):
     """
-    central_difference(f, params, x, delta) calculates an approximation of the gradient
+    my_central_difference(f, params, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
 
         (f(x + delta/2) - f(x - delta/2)) / delta
     """
-    # numpy should fix dimensions
-    f_positiveDelta = f(params, x + delta/2)
-    f_negativeDelta = f(params, x - delta/2)
+    n, m = x.shape
 
-    est_slope = (f_positiveDelta - f_negativeDelta) / delta
+    delta_matrix = np.identity(n) * delta/2
 
-    est_grad = np.array([[delta],[f_positiveDelta -  f_negativeDelta]])
-    est_grad = (est_grad / np.linalg.norm(est_grad)) * est_slope
+    est_gradient = []
+    for i in range(n):
+        new_x_pos = x + delta_matrix[i].reshape(n, 1)
+        new_x_neg = x - delta_matrix[i].reshape(n, 1)
 
-    return (est_slope, est_grad)
+        f_positiveDelta = f(params, new_x_pos)
+        f_negativeDelta = f(params, new_x_neg)
+
+        est_gradient.append((f_positiveDelta - f_negativeDelta) / delta)
+
+    return (np.linalg.norm(est_gradient), est_gradient)
+
+def central_difference(f, x, delta):
+    """
+    central_difference(f, x, delta) calculates an approximation of the gradient
+    at a given point, for a given function f. The central difference is defined as:
+
+        (f(x + delta/2) - f(x - delta/2)) / delta
+    """
+    n, m = x.size
+
+    delta_matrix = np.identity(n) * delta/2
+
+    est_gradient = []
+    for i in range(n):
+        new_x_pos = x + delta_matrix[i]
+        new_x_neg = x - delta_matrix[i]
+
+        if debug:
+            print("X old {}\nX new {}\n".format(x, new_x_pos))
+
+        f_pos = f(new_x_pos)
+        f_neg = f(new_x_neg)
+
+        est_gradient.append((f_positiveDelta - f_negativeDelta) / delta)
+
+    return (np.linalg.norm(est_gradient), est_gradient)
 
 def converge_grad_norm(grad, threshold):
     """

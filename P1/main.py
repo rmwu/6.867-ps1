@@ -78,7 +78,7 @@ def main():
     func_name, eta, threshold = sys.argv[1:4]
 
     if len(sys.argv) == 5:
-        delta = sys.argv[4]
+        delta = float(sys.argv[4])
     else:
         delta = 0.05
 
