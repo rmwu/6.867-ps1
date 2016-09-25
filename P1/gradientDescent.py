@@ -10,10 +10,12 @@ import math
 # Main Functions
 ##################################
 
-def gradient_descent(x_init, params, loss, gradient, 
-                     eta, threshold, grad_norm = False):
+def gradient_descent(x_init, params, loss, function, gradient, 
+                     eta, threshold, grad_norm = False, delta = 0.05):
     """
     Parameters
+        x_init
+            2x1
         params
             2-tuple for parameters (for function). Either gauss_mean,
             gauss_cov OR A_quad_bowl, b_quad_bowl
@@ -33,16 +35,16 @@ def gradient_descent(x_init, params, loss, gradient,
             we compute change in the vector
     """
     n, m = x_init.shape
-    p1, p2 = params
 
     current_x = x_init
     current_loss = 0
 
     while True:
         current_x, grad = update(gradient, params, n, current_x, eta)
-        # update current_loss
-
         current_norm = np.linalg.norm(grad)
+
+        est_norm = central_difference(function, params, n, current_x, delta)
+        # update current_loss
 
         print("Gradient norm: {} | Current X: {}".format(current_norm, current_x))
 
@@ -52,6 +54,7 @@ def gradient_descent(x_init, params, loss, gradient,
         elif not grad_norm and converge_delta_fx(prev_loss, current_loss, threshold):
             break
 
+        # rip me
         elif current_norm > 1000:
             break
 
@@ -74,6 +77,11 @@ def update(gradient, params, n, x, eta):
     """
     grad = gradient(params, n, x)
     x_new = x - eta * grad
+
+    print(x)
+    print(x_new)
+    print(grad)
+    print('k')
 
     return (grad, x_new)
 
@@ -116,6 +124,7 @@ def negative_gaussian(params, n, x):
     mu, Sigma = params
 
     scaling_factor = 1/(math.sqrt(math.pi) ** n * np.linalg.det(Sigma))
+    
     exponent = -.5 * (x - mu).T.dot(np.linalg.inv(Sigma)).dot(x - mu)
 
     return math.exp(exponent)
@@ -148,7 +157,7 @@ def quadratic_bowl(params, n, x):
     A, b = params
     return 0.5 * x.T.dot(A).dot(x) - x.T.dot(b)
 
-# error
+# estimation and loss funtions
 
 def least_square_error(X, Theta, y):
     """
@@ -159,18 +168,15 @@ def least_square_error(X, Theta, y):
     """
     pass
 
-def central_difference(f, x, delta):
+def central_difference(f, params, n, x, delta):
     """
-    central_difference(f, x, delta) calculates an approximation of the gradient
+    central_difference(f, params, n, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
 
         (f(x + delta/2) - f(x - delta/2)) / delta
-
-    TODO dimensions
-
-    TODO kwargs
     """
-    return (f(x + delta/2) - f(x - delta/2)) / delta
+    # numpy should fix dimensions
+    return (f(params, n, x + delta/2) - f(params, n, x - delta/2)) / delta
 
 def converge_grad_norm(grad, threshold):
     """
