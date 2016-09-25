@@ -30,20 +30,22 @@ def get_params():
 # Part Testing
 ##################################
 
-def test_part1(is_gaussian, conv_grad_norm):
+def test_part1(is_gaussian, conv_grad_norm, eta, threshold):
     """
     Parameters
         is_gaussian     True if use gaussian, False for quad bowl
         conv_grad_norm  True if we converge by gradient norm, False for
                         change in loss(x)
+        eta             step size
+        threshold       convergence threshold
     """
     mu, Sigma, A, b = get_params()
     mu = np.array(mu).reshape(2, 1)
 
     b = np.array(b).reshape(2, 1)
 
-    eta = 1000  # step size
-    threshold = 1e-10  # convergence threshold for gradient norm
+    # eta = 1000  # step size
+    # threshold = 1e-10  # convergence threshold for gradient norm
     params = (mu, Sigma) if is_gaussian else (A, b)
     function = negative_gaussian if is_gaussian else quadratic_bowl
     gradient = d_negative_gaussian if is_gaussian else d_quadratic_bowl
@@ -77,10 +79,17 @@ def test_part2(is_gaussian, conv_grad_norm):
     gradient_descent(x_init, params, least_square_error, function, gradient, 
                      eta, threshold, conv_grad_norm, delta)
 
+def usage():
+    raise ValueError("sys.argv must contain:\n'guass' or 'quad'\neta\nthreshold")
+
 def main():
-    if len(sys.argv) != 2:
-        raise ValueError("must specify 'gauss' or 'quad'")
-    func_name = sys.argv[1]
+    if len(sys.argv) != 4:
+        usage()
+
+    func_name, eta, threshold = sys.argv[1:4]
+    eta, threshold = float(eta), float(threshold)
+
+    print("eta: {}\nthreshold: {}".format(eta, threshold))
 
     is_gaussian = False
     conv_grad_norm = True
@@ -90,7 +99,7 @@ def main():
     elif func_name != 'quad':
         raise ValueError("must specify 'gauss' or 'quad'")
 
-    test_part1(is_gaussian, conv_grad_norm)
+    test_part1(is_gaussian, conv_grad_norm, eta, threshold)
 
 if __name__ == "__main__":
     if debug:
