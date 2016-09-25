@@ -2,6 +2,7 @@
 6.867 Fall 2016 - Problem Set 1
 Problem 1. Implement Gradient Descent
 """
+from __future__ import division
 
 import numpy as np
 import math
@@ -46,18 +47,14 @@ def gradient_descent(x_init, params, loss, function, gradient,
         est_norm = central_difference(function, params, n, current_x, delta)
         # update current_loss
 
-        print("Gradient norm: {} | Current X: {}".format(current_norm, current_x))
+        print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}"\
+            .format(current_norm, current_x, function(params, n, current_x)))
 
         if grad_norm and converge_grad_norm(grad, threshold):
             break
 
         elif not grad_norm and converge_delta_fx(prev_loss, current_loss, threshold):
             break
-
-        # rip me
-        elif current_norm > 1000:
-            break
-
         # update previous loss
 
     return (current_x, current_loss)
@@ -78,12 +75,11 @@ def update(gradient, params, n, x, eta):
     grad = gradient(params, n, x)
     x_new = x - eta * grad
 
-    print(x)
-    print(x_new)
-    print(grad)
-    print('k')
+    print("\nupdating x from\n{}\nto\n{}\n".format(x, x_new))
+    print("gradient=\n{}\n".format(grad))
+    # print('k')
 
-    return (grad, x_new)
+    return (x_new, grad)
 
 ##################################
 # Mathematical Implementations
@@ -99,17 +95,14 @@ def d_negative_gaussian(params, n, x):
         f(x) = [math]
 
     Parameters
-        params      contains (mu, Sigma)
+        params      contains (mu, sigma)
         n           number of samples
         x           current vector
     """
-    mu, Sigma = params
-
+    mu, sigma = params
     f_x = negative_gaussian(params, n, mu)
 
-    n, m = (x - mu).shape
-    # return -f_x * np.linalg.inv(Sigma).dot((x - mu).reshape(m, n))
-    return -f_x * np.linalg.inv(Sigma).dot(x - mu)
+    return -f_x * np.linalg.inv(sigma).dot(x - mu)
 
 def negative_gaussian(params, n, x):
     """
@@ -123,11 +116,11 @@ def negative_gaussian(params, n, x):
     """
     mu, Sigma = params
 
-    scaling_factor = 1/(math.sqrt(math.pi) ** n * np.linalg.det(Sigma))
+    gaussian_normalization = 1/(math.sqrt((2*math.pi)**n * np.linalg.det(Sigma)))
     
-    exponent = -.5 * (x - mu).T.dot(np.linalg.inv(Sigma)).dot(x - mu)
+    exponent = -1/2 * (x - mu).T.dot(np.linalg.inv(Sigma)).dot(x - mu)
 
-    return math.exp(exponent)
+    return -1 * gaussian_normalization * math.exp(exponent)
 
 def d_quadratic_bowl(params, n, x):
     """
