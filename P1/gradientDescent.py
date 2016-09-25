@@ -7,11 +7,45 @@ from __future__ import division
 import numpy as np
 import math
 
+debug = False
+
 ##################################
 # Main Functions
 ##################################
 
-def gradient_descent(x_init, params, loss, function, gradient, 
+def generic_gradient_descent(x_init, objective, gradient, eta, threshold):
+    """
+    xxxx
+    """
+    iterations = 0
+
+    current_x = x_init # this one is updated
+    fx0 = 0 # last f(x)
+    fx1 = float("inf") # current f(x)
+
+    while True:
+        current_x, grad = generic_update(gradient, current_x, eta)
+        current_norm = np.linalg.norm(grad)
+
+        fx1 = function(current_x)
+
+        if debug:
+            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\n"\
+            .format(current_norm, current_x, fx1))
+            print("Past objective function: {}\n".format(fx0))
+
+        if converge_delta_fx(fx0, fx1, threshold):
+            break
+
+        # update "past" objective function
+        fx0 = fx1
+        iterations += 1
+
+    print("Converged after {} iterations\n".format(iterations))
+    print("We updated to {}\n".format(current_x))
+    return (current_x, fx1)
+
+def gradient_descent(x_init, params, function, gradient, 
                      eta, threshold, grad_norm = False, delta = 0.05):
     """
     Parameters
@@ -20,10 +54,6 @@ def gradient_descent(x_init, params, loss, function, gradient,
         params
             2-tuple for parameters (for function). Either gauss_mean,
             gauss_cov OR A_quad_bowl, b_quad_bowl
-        loss
-            function used to calculate how good our guess
-            is so far. In this case, our objective_function
-            is a loss function to be minimized.
         gradient
             function used to calculate the gradient at a given
             point.
@@ -38,29 +68,72 @@ def gradient_descent(x_init, params, loss, function, gradient,
     n, m = x_init.shape
 
     current_x = x_init
-    current_loss = 0
+    fx0 = 0 # last f(x)
+    fx1 = float("inf") # current f(x)
+
+    iterations = 0 # count iterations until converge
 
     while True:
-        current_x, grad = update(gradient, params, n, current_x, eta)
+        # update step
+        current_x, grad = update(gradient, params, current_x, eta)
         current_norm = np.linalg.norm(grad)
 
-        est_norm = central_difference(function, params, n, current_x, delta)
-        # update current_loss
+        # estimate gradient norm, gradient
+        est_slope, est_grad = central_difference(function, params, current_x, delta)
+        # calculate objective function
+        fx1 = function(params, current_x)
 
-        print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}"\
-            .format(current_norm, current_x, function(params, n, current_x)))
+        if debug:
+            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated gradient: {}"\
+            .format(current_norm, current_x, fx1, est_grad))
+            print("Past objective function: {}\n".format(fx0))
 
+        # check for convergence
         if grad_norm and converge_grad_norm(grad, threshold):
             break
 
-        elif not grad_norm and converge_delta_fx(prev_loss, current_loss, threshold):
+        elif not grad_norm and converge_delta_fx(fx0, fx1, threshold):
             break
-        # update previous loss
+        
+        # update "past" objective function
+        fx0 = fx1
+        iterations += 1
 
-    return (current_x, current_loss)
+    print("Converged after {} iterations\n".format(iterations))
+    print("We updated to {}\n".format(current_x))
+    return (current_x, fx1)
+
+def batch_gradient_descent(x, y, eta, threshold):
+    """
+    batch_gradient_descent(x, y) performs batch gradient descent,
+    given data x and target vector y. It minimizes the MSE.
+
+    Parameters
+        eta
+            constant step size
+        threshold
+            convergence threshold
+    """
+    mse = -float("inf")
+    iterations = 0 # count iterations until converge
+
+    while mse > threshold:
 
 
-def update(gradient, params, n, x, eta):
+        # update
+        mse = least_square_error(x, theta, y)
+        iterations += 1
+
+    print("Converged after {} iterations\n".format(iterations))
+    return (theta, mse)
+
+def generic_update(gradient, x, eta):
+    grad = gradient(x)
+    x_new = x - eta * grad
+
+    return (x_new, grad)
+
+def update(gradient, params, x, eta):
     """
     update(gradient, params, n, current_x, eta) returns the
     new x value after updating.
@@ -68,16 +141,15 @@ def update(gradient, params, n, x, eta):
     Parameters
         gradient    gradient function
         param       parameters
-        n           number of samples
         x           vector to be updated
         eta         constant step size
     """
-    grad = gradient(params, n, x)
+    grad = gradient(params, x)
     x_new = x - eta * grad
 
-    print("\nupdating x from\n{}\nto\n{}\n".format(x, x_new))
-    print("gradient=\n{}\n".format(grad))
-    # print('k')
+    if debug:
+        print("\nupdating x from\n{}\nto\n{}\n".format(x, x_new))
+        print("gradient=\n{}\n".format(grad))
 
     return (x_new, grad)
 
@@ -87,9 +159,9 @@ def update(gradient, params, n, x, eta):
 
 # gradient computing functions
 
-def d_negative_gaussian(params, n, x):
+def d_negative_gaussian(params, x):
     """
-    d_negative_gaussian(params, n, x) calculates the derivative
+    d_negative_gaussian(params, x) calculates the derivative
     of a negative gaussian function, which has the form:
 
         f(x) = [math]
@@ -100,21 +172,23 @@ def d_negative_gaussian(params, n, x):
         x           current vector
     """
     mu, sigma = params
+    n = Sigma.shape[0]
+
     f_x = negative_gaussian(params, n, mu)
 
     return -f_x * np.linalg.inv(sigma).dot(x - mu)
 
-def negative_gaussian(params, n, x):
+def negative_gaussian(params, x):
     """
-    negative_gaussian(params, n, x) calculates the negative gaussian
+    negative_gaussian(params, x) calculates the negative gaussian
     function given inputs.
 
     Parameters
         params      contains (mu, Sigma)
-        n           number of samples
         x           current vector
     """
     mu, Sigma = params
+    n = Sigma.shape[0]
 
     gaussian_normalization = 1/(math.sqrt((2*math.pi)**n * np.linalg.det(Sigma)))
     
@@ -122,54 +196,82 @@ def negative_gaussian(params, n, x):
 
     return -1 * gaussian_normalization * math.exp(exponent)
 
-def d_quadratic_bowl(params, n, x):
+def d_quadratic_bowl(params, x):
     """
-    d_quadratic_bowl(params, n, x) calculates the derivative of a 
+    d_quadratic_bowl(params, x) calculates the derivative of a 
     quadratic bowl, which has the form:
 
         f(x) = 1/2 xT Ax - xT b
 
     Parameters
         params      contains (A, b)
-        n           number of samples
         x           current vector
     """
     A, b = params
     return A.dot(x) - b
 
-def quadratic_bowl(params, n, x):
+def quadratic_bowl(params, x):
     """
-    quadratic_bowl(A, x, b) calculates the quadratic bowl function for given
+    quadratic_bowl(params, b) calculates the quadratic bowl function for given
     A, x, and b.
 
     Parameters
         params      contains (A, b)
-        n           number of samples
         x           current vector
     """
     A, b = params
     return 0.5 * x.T.dot(A).dot(x) - x.T.dot(b)
 
-# estimation and loss funtions
-
-def least_square_error(X, Theta, y):
+def d_squared_error(params, theta):
     """
-    least_square_error(X, Theta, y) returns the least square error, defined
+    d_squared_error(x, y, theta) calculates the gradient of J(x), which is
+    the squared error:
+
+        J(x) = || x theta - y|| ^2
+
+    Parameters
+        params      contains (x, y), n by n and n by 1
+        theta       n by 1
+    """
+    x, y = params
+    n = theta.shape[0]
+
+    return (-2)*x.T.dot(x.dot(theta) - y)
+
+def squared_error(params, theta):
+    """
+    squared_error(x, Theta, y) returns the square error, defined
     as:
 
-        J(Theta) = || X Theta - y || ^2
-    """
-    pass
+        J(theta) = || x theta - y || ^2
 
-def central_difference(f, params, n, x, delta):
+    Parameters
+        x       n by n
+        theta   n by 1
+        y       n by 1
     """
-    central_difference(f, params, n, x, delta) calculates an approximation of the gradient
+    x, y = params
+    return np.linalg.norm(x.dot(theta) - y) ** 2
+
+# estimation and loss funtions
+
+def central_difference(f, params, x, delta):
+    """
+    central_difference(f, params, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
 
         (f(x + delta/2) - f(x - delta/2)) / delta
     """
     # numpy should fix dimensions
-    return (f(params, n, x + delta/2) - f(params, n, x - delta/2)) / delta
+    f_positiveDelta = f(params, x + delta/2)
+    f_negativeDelta = f(params, x - delta/2)
+
+    est_slope = (f_positiveDelta - f_negativeDelta) / delta
+
+    est_grad = np.array([[delta],[f_positiveDelta -  f_negativeDelta]])
+    est_grad = (est_grad / np.linalg.norm(est_grad)) * est_slope
+
+    return (est_slope, est_grad)
 
 def converge_grad_norm(grad, threshold):
     """
@@ -193,3 +295,7 @@ def converge_delta_fx(fx0, fx1, threshold):
         threshold   must be a scalar
     """
     return abs(fx1 - fx0) < threshold
+
+##################################
+# Stochastic GD
+##################################
