@@ -57,11 +57,12 @@ def simple_gradient_descent(is_gaussian, conv_grad_norm, eta, threshold, delta =
 
 def test_batch_gradient_descent(conv_grad_norm, eta, threshold, delta = 0.05):
     """
-    gradient_descent(x_init, params, function, gradient, 
-                     eta, threshold, grad_norm = False, delta = 0.05):
+    omg it converged for eta = 0.000001
     """
-    theta_init = np.arange(10).reshape(10, 1)
+    theta_init = np.array([0 for i in range(10)]).reshape(10, 1)
     x, y = get_inputs()
+
+    x, y = np.array(x, dtype='float64').reshape(100, 10), np.array(y).reshape(100, 1)
 
     gradient_descent(theta_init, (x, y), squared_error, d_squared_error,
                     eta, threshold, conv_grad_norm, delta)
@@ -77,7 +78,7 @@ def main():
     func_name, eta, threshold = sys.argv[1:4]
 
     if len(sys.argv) == 5:
-        delta = sys.argv[4]
+        delta = float(sys.argv[4])
     else:
         delta = 0.05
 
