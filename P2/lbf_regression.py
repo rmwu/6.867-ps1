@@ -5,8 +5,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-import P1.gradientDescent as gd
-import loadFittingDataP2 as lfd
+import P2.loadFittingDataP2 as lfd
 
 
 def power_basis(degree):
@@ -22,6 +21,10 @@ def cosine_basis(degree):
 
 
 def basis_fit(X, Y, basis_functions):
+    """
+    Perform a maximum-likelihood linear basis-function-fit with specified
+    basis_functions.
+    """
     if len(X) != len(Y):
         raise ValueError("X and Y must have same dimensions n x 1")
 
@@ -54,21 +57,10 @@ def design_matrix(basis_functions, X):
      [f0(x1), f1(x1), ...],
      ...]
     """
-    return [[f(x) for f in basis_functions] for x in X]
+    return np.array([[f(x) for f in basis_functions] for x in X])
 
 
-def main():
-    if len(sys.argv) != 3:
-        raise ValueError("must give basis name ('poly' or 'cos') and fit degree")
-
-    basis_name = sys.argv[1]
-    fit_degree = int(sys.argv[2])
-    poly_basis = True
-    if basis_name == 'cos':
-        poly_basis = False
-    elif basis_name != 'poly':
-        raise ValueError("basis name must be 'poly' or 'cos'")
-
+def visualize(fit_degree, poly_basis):
     X, Y = lfd.getData(ifPlotData=False)
 
     # plot the points
@@ -86,9 +78,23 @@ def main():
     basis_fit_plot(X, Y, basis_functions, x_arange, **fit_kwargs)
 
     # nice setup
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.xlabel('$x$')
+    plt.ylabel('$y$')
     plt.show()
+
+
+def main():
+    if len(sys.argv) != 3:
+        raise ValueError("must give basis name ('poly' or 'cos') and fit degree")
+
+    basis_name = sys.argv[1]
+    fit_degree = int(sys.argv[2])
+    poly_basis = True
+    if basis_name == 'cos':
+        poly_basis = False
+    elif basis_name != 'poly':
+        raise ValueError("basis name must be 'poly' or 'cos'")
+    visualize(fit_degree, poly_basis)
 
 
 if __name__ == '__main__':

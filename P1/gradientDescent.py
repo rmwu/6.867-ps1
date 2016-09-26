@@ -26,7 +26,7 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
         gradient    gradient function
         eta         step size
         threshold   convergence threshold
-        delta       numerical gradient estimate
+
         conv_by_grad true if converge by grad norm, false otherwise
         stochastic  true if stochastic updates, false by default
     """
@@ -52,21 +52,19 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
         # grad_norms.append(current_norm)
 
         # estimate gradient norm, gradient
-        if stochastic:
-            est_slope, est_grad = central_difference(objective, current_x, delta, i)
-        else:
-            est_slope, est_grad = central_difference(objective, current_x, delta)
+        # if stochastic:
+        #     est_grad = central_difference(objective, current_x, delta, i)
+        # else:
+        #     est_grad = central_difference(objective, current_x, delta)
+        # est_slope = np.linalg.norm(est_grad)
         # calculate objective function
 
-        if stochastic:
-            fx1 = objective(current_x, i)
-        else:
-            fx1 = objective(current_x)
+        fx1 = objective(current_x)
 
         if debug:
-            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
-            .format(current_norm, current_x, fx1, est_grad))
-            print("Past objective function: {}\n".format(fx0))
+            # print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
+            #     .format(current_norm, current_x, fx1, est_grad))
+            print("Past objective function: {}".format(fx0))
 
         # check for convergence
         if conv_by_grad and converge_grad(grad, threshold):
@@ -97,14 +95,16 @@ def update(gradient, x, eta, i = None, t = None):
         eta         constant step size
         i           optional, to specify stochastic
     """
+    step = eta
     if i is not None:
         assert t is not None
         grad = gradient(x, i)
-        eta = (eta + t) ** (-0.75) # adjust learning rate
+        step = (eta + t) ** (-0.6) # adjust learning rate
+        # print("eta={}\n\n".format(step))
     else:
         grad = gradient(x)
 
-    x_new = x - eta * grad
+    x_new = x - step * grad
 
     return (x_new, grad)
 
@@ -112,21 +112,22 @@ def update(gradient, x, eta, i = None, t = None):
 # Estimations
 ##################################
 
-def central_difference(f, x, delta, stochI = None):
+def central_difference(f, x, delta, stochI=None):
     """
     central_difference(f, x, delta) calculates an approximation of the gradient
     at a given point, for a given function f. The central difference is defined as:
 
         (f(x + delta/2) - f(x - delta/2)) / delta
     """
-    n, m = x.shape
+    n = x.shape[0]
 
     delta_matrix = np.identity(n) * delta/2
 
     est_gradient = []
     for i in range(n):
-        new_x_pos = x + delta_matrix[i].reshape(n, 1)
-        new_x_neg = x - delta_matrix[i].reshape(n, 1)
+        ihat = delta_matrix[i].reshape(n)  # unit vector \hat{x}_i
+        new_x_pos = x + ihat
+        new_x_neg = x - ihat
 
         if stochI is not None:
             f_pos = f(new_x_pos, stochI)
@@ -136,8 +137,10 @@ def central_difference(f, x, delta, stochI = None):
             f_neg = f(new_x_neg)
 
         est_gradient.append((f_pos - f_neg) / delta)
+    
 
-    return (np.linalg.norm(est_gradient), est_gradient)
+    # return (np.linalg.norm(est_gradient), est_gradient)
+    return np.array(est_gradient).reshape(n, 1)
 
 def converge_grad(grad, threshold):
     """

@@ -1,5 +1,6 @@
 .DS_STORE
 *.pyc
+.ipynb_checkpoints
 *.gz
 
 ## Core latex/pdflatex auxiliary files:
@@ -22,5 +23,6 @@
 # *.ps
 # *.eps
 *.pdf
+!paper/img/*.pdf
 **out.txt
 **play
