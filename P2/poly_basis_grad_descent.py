@@ -18,7 +18,8 @@ def square_sum_error(y_guess, y_actual):
 
 def poly_basis_square_sum_error(weight_vector, X, Y):
     """
-    Squared sum error, given a weight vector from a polynomial basis fit
+    Squared sum error, given a weight vector from a polynomial basis fit and
+    data points (x, y) (stored in X and Y vectors)
     """
     assert (len(weight_vector.shape)==1 or weight_vector.shape[1]==1)
     degree = len(weight_vector) - 1
@@ -34,6 +35,17 @@ def poly_basis_square_sum_error_grad(weight_vector, X, Y):
     degree = len(weight_vector) - 1
     phi = lbfr.design_matrix(lbfr.power_basis(degree), X)
     return phi.T.dot(phi.dot(weight_vector) - Y)
+
+
+def poly_basis_square_sum_error_single_elt_grad(weight_vector, X, Y, i):
+    """
+    Same as above, but only the gradient on a single data point
+    """
+    degree = len(weight_vector) - 1
+    single_data_point_x = np.array([X[i]])
+    single_data_point_y = np.array([Y[i]])
+    phi = lbfr.design_matrix(lbfr.power_basis(degree), single_data_point_x)
+    return phi.T.dot(phi.dot(weight_vector) - single_data_point_y)
 
 
 def verify_gradient():
@@ -97,7 +109,6 @@ def main():
         False, # no convergence by grad norm
         stochastic=True
         )
-
 
 
 
