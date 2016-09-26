@@ -97,11 +97,12 @@ In other words, we transform the independent variable $x$ by basis functions $\p
 
 We wrote a procedure for general linear basis function regression with user-specified data points and basis functions that found the maximum-likelihood weight vector analytically, via Bishop Equation 3.15, which we restate here:
 \begin{equation}
+\label{eq:max-likelihood-weights}
 w = (\Phi^T\Phi)\inv\Phi^T Y
 \end{equation}
 where $Y$ is a vector of $y^{(n)}$ values from our dataset and $\Phi$ is the design matrix, given by
 \begin{equation}
-\Phi_{ij} = \phi_i(x^{(j)}).
+\Phi_{ij} = \phi_j(x^{(i)}).
 \end{equation}
 
 \subsection{Polynomial Basis Functions}
@@ -110,11 +111,10 @@ We tested our procedure by performing fits on a dataset of 11 points with polyno
 \begin{equation}
 y(x) = \cos(\pi x) + \cos(2\pi x).
 \end{equation}
-We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}.
+We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}. Note the obvious underfitting and overfitting introduced by using models with excessively low or high degrees.
 
 
-
-\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
+\begin{figure}[h] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=2.25in]{img/2-1_degree0.pdf}  % $PLACEHOLDER
    \includegraphics[width=2.25in]{img/2-1_degree1.pdf}  % $PLACEHOLDER
@@ -124,10 +124,20 @@ We plot the results of these fits for varying values of degree~$M$ in Figure~\re
    \label{fig:2.1-polybasis}
 \end{figure}
 
-% #PLACEHOLDER
-% TODO comment on under/overfitting, etc.
 
 \subsection{Regression by Gradient Descent}
+
+Though there is a closed-form formula for the best-fit weight vector (Equation~\ref{eq:max-likelihood-weights}), we decided to verify our results from the previous section through gradient descent.
+
+To this end, we considered the sum-of-squares error (SSE) for our problem:
+\beq
+J(w) = \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2,
+\eeq
+which has gradient
+\beq
+\nabla J(w) = 
+\eeq
+
 
 % 2b/c
 
