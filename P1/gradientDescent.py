@@ -8,7 +8,7 @@ import numpy as np
 import pylab as pl
 import matplotlib.pyplot as plt
 
-debug = False
+debug = True
 
 ##################################
 # Input handling
@@ -212,21 +212,18 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
         # grad_norms.append(current_norm)
 
         # estimate gradient norm, gradient
-        if stochastic:
-            est_grad = central_difference(objective, current_x, delta, i)
-        else:
-            est_grad = central_difference(objective, current_x, delta)
-        est_slope = np.linalg.norm(est_grad)
+        # if stochastic:
+        #     est_grad = central_difference(objective, current_x, delta, i)
+        # else:
+        #     est_grad = central_difference(objective, current_x, delta)
+        # est_slope = np.linalg.norm(est_grad)
         # calculate objective function
 
-        if stochastic:
-            fx1 = objective(current_x, i)
-        else:
-            fx1 = objective(current_x)
+        fx1 = objective(current_x)
 
         if debug:
-            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
-                .format(current_norm, current_x, fx1, est_grad))
+            # print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
+            #     .format(current_norm, current_x, fx1, est_grad))
             print("Past objective function: {}".format(fx0))
 
         # check for convergence
@@ -262,8 +259,8 @@ def update(gradient, x, eta, i = None, t = None):
     if i is not None:
         assert t is not None
         grad = gradient(x, i)
-        step = (eta + t) ** (-0.75) # adjust learning rate
-        print("eta={}\n\n".format(step))
+        step = (eta + t) ** (-0.6) # adjust learning rate
+        # print("eta={}\n\n".format(step))
     else:
         grad = gradient(x)
 
