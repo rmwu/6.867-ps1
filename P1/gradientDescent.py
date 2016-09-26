@@ -6,10 +6,8 @@ from __future__ import division
 import numpy as np
 
 import pylab as pl
-import matplotlib.pyplot as plt
 
 debug = False
-plot = False
 
 ##################################
 # Main Functions
@@ -40,6 +38,7 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
     fx1 = float("inf") # current f(x)
 
     grad_norms = []
+    delta_objectives = []
 
     while True:
         i = iterations % n
@@ -62,6 +61,7 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
         # calculate objective function
 
         fx1 = objective(current_x)
+        delta_objectives.append(np.asscalar(fx1 - fx0))
 
         if debug:
             # print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
@@ -82,10 +82,7 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
     print("Converged after {} iterations\n".format(iterations))
     print("We updated to {}\n".format(current_x))
 
-    if plot:
-        visualize(iterations, grad_norms)
-
-    return (current_x, fx1)
+    return (current_x, fx1, iterations, grad_norms, delta_objectives)
 
 def update(gradient, x, eta, i = None, t = None):
     """
@@ -166,11 +163,3 @@ def converge_delta_fx(fx0, fx1, threshold):
         threshold   must be a scalar
     """
     return abs(fx1 - fx0) < threshold
-
-def visualize(iterations, grad_norms):
-    # plot gradient over time
-    plt.plot(np.arange(iterations + 1),grad_norms, ".")
-    plt.xlabel("iterations")
-    plt.ylabel("gradient norm")
-
-    plt.show()
