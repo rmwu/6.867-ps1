@@ -120,7 +120,10 @@ def squared_error(theta):
     return np.linalg.norm(x_data.dot(theta) - y_data) ** 2
 
 def d_stochastic_error(theta, i):
-    return 2 * stochastic_error(theta, i) * x_data[i].reshape(10, 1)
+    xi = x_data[i].reshape(10, 1)
+    yi = y_data[i]
+
+    return 2 * xi * (xi.T.dot(theta.reshape(10, 1))-yi)
 
 def stochastic_error(theta, i):
     """
@@ -131,7 +134,9 @@ def stochastic_error(theta, i):
     where t represents the iteration, and i represents the sample index
     """
     xiT = x_data[i].reshape(10, 1).T
-    yi = y_data[i][0]
+    yi = y_data[i]
 
-    return (xiT.dot(theta.reshape(10, 1))[0][0]-yi) ** 2
+    # print("x {} and y{}".format(xiT, yi))
+    # print("stoch error{}".format((xiT.dot(theta.reshape(10, 1))-yi) ** 2))
+    return (xiT.dot(theta.reshape(10, 1))-yi) ** 2 
 

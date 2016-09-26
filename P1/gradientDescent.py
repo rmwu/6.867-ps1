@@ -6,7 +6,7 @@ from __future__ import division
 import numpy as np
 from math_functions import *
 
-debug = False
+debug = True
 
 ##################################
 # Main Functions
@@ -59,7 +59,7 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
             fx1 = objective(current_x)
 
         if debug:
-            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated gradient: {}"\
+            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
             .format(current_norm, current_x, fx1, est_grad))
             print("Past objective function: {}\n".format(fx0))
 
@@ -91,6 +91,7 @@ def update(gradient, x, eta, i = None, t = None):
         i           optional, to specify stochastic
     """
     if i is not None:
+        assert t is not None
         grad = gradient(x, i)
         eta = (eta + t) ** (-0.75) # adjust learning rate
     else:
