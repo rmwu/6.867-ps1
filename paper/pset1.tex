@@ -1,7 +1,8 @@
 \documentclass{amsart}
 \usepackage[nosetup]{tony}
+\usepackage{graphicx}
 
-\title{TITLE HERE} % #PLACEHOLDER
+\title{6.867: Problem Set 1}
 \date{September 29, 2016}
 
 \begin{document}
@@ -111,12 +112,17 @@ y(x) = \cos(\pi x) + \cos(2\pi x).
 \end{equation}
 We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}.
 
-%\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
-%   \centering
-%   \includegraphics[width=2in]{example.jpg}  % $PLACEHOLDER
-%   \caption{example caption}  % $PLACEHOLDER
-%   \label{fig:2.1-polybasis}
-%\end{figure}
+
+
+\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
+   \centering
+   \includegraphics[width=2.25in]{img/2-1_degree0.pdf}  % $PLACEHOLDER
+   \includegraphics[width=2.25in]{img/2-1_degree1.pdf}  % $PLACEHOLDER
+   \includegraphics[width=2.25in]{img/2-1_degree3.pdf}  % $PLACEHOLDER
+   \includegraphics[width=2.25in]{img/2-1_degree10.pdf}  % $PLACEHOLDER
+   \caption{Plots of our polynomial basis fits for degrees $M=0,1,3,10$. The degree ascends from top to bottom, and within each row, from left to right.}
+   \label{fig:2.1-polybasis}
+\end{figure}
 
 % #PLACEHOLDER
 % TODO comment on under/overfitting, etc.

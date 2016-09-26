@@ -22,5 +22,6 @@
 # *.ps
 # *.eps
 *.pdf
+!paper/img/*.pdf
 **out.txt
 **play
