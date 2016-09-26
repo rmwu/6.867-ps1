@@ -61,7 +61,7 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
         # calculate objective function
 
         fx1 = objective(current_x)
-        delta_objectives.append(np.asscalar(fx1 - fx0))
+        delta_objectives.append(fx1 - fx0)
 
         if debug:
             # print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
@@ -139,7 +139,7 @@ def central_difference(f, x, delta, stochI=None):
         est_gradient.append((f_pos - f_neg) / delta)
     
     # return (np.linalg.norm(est_gradient), est_gradient)
-    return np.array(est_gradient).reshape(n, 1)
+    return np.array(est_gradient).reshape(n)
 
 def converge_grad(grad, threshold):
     """

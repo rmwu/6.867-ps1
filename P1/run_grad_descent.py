@@ -24,13 +24,15 @@ def simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta = 0
         eta             step size (0.0001 good for quad)
         threshold       convergence threshold
     """
-    function = negative_gaussian if is_gaussian else quadratic_bowl
+    objective = negative_gaussian if is_gaussian else quadratic_bowl
     gradient = d_negative_gaussian if is_gaussian else d_quadratic_bowl
+
+    verify_gradient(objective, gradient, 1e-8)
 
     if starting_guess is None:
         starting_guess = np.array([[0], [0]])
 
-    return gradient_descent(starting_guess, function, gradient, 
+    return gradient_descent(starting_guess, objective, gradient, 
                      eta, threshold, delta, conv_by_grad)
 
 def test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
@@ -38,6 +40,8 @@ def test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     omg it converged for eta = 0.000001
     """
     theta_init = np.array([0 for i in range(10)]).reshape(10, 1)
+
+    verify_gradient(squared_error, d_squared_error, 1e-8)
 
     return gradient_descent(theta_init, squared_error, d_squared_error,
                     eta, threshold, delta, conv_by_grad)
@@ -48,20 +52,41 @@ def test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05)
     """
     theta_init = np.array([-5.3 for i in range(10)]).reshape(10, 1)
 
+    verify_gradient(stochastic_error, d_stochastic_error, 1e-8)
+
     return gradient_descent(theta_init, stochastic_error, d_stochastic_error,
                     eta, threshold, delta, conv_by_grad, True)
 
+def test_verify_gradient():
+    deltas = [1000, 100, 10, 1e-2, 1e-4, 1e-8]
+    for delta in deltas:
+        verify_gradient(squared_error, d_squared_error, delta)
+
 ##################################
-# Visualization with pyplot
+# Numerical analysis
 ##################################
 
-# def visualize(iterations, grad_norms):
-#     # plot gradient over time
-#     plt.plot(np.arange(iterations + 1),grad_norms, "")
-#     plt.xlabel("iterations")
-#     plt.ylabel("gradient norm")
+def verify_gradient(objective, gradient, delta):
+    """
+    Verifies the our gradient function.
+    """
+    dimensions = 10
+    weight_vector = np.random.rand(dimensions)
 
-#     plt.show()
+    approx_grad = central_difference(objective, weight_vector, delta)
+    exact_grad = gradient(weight_vector)
+
+    grad_err = approx_grad - exact_grad
+    mse = grad_err.T.dot(grad_err).mean()
+
+    approx_grad_norm_sq = approx_grad.T.dot(approx_grad)
+
+    print("verified gradient with central difference approximation, delta = {}".format(delta))
+    print("delta is {} percent of the gradient norm sq".format(delta / math.sqrt(approx_grad_norm_sq)))
+    print("mse is {} percent of the gradient norm sq".format(mse / approx_grad_norm_sq))
+    print("exact gradient\n{}\napprox gradient\n{}\nmean sq err\n{}\n\n".format(exact_grad, approx_grad, mse))
+    if mse / approx_grad_norm_sq > 1e-5:
+        raise RuntimeError("bad gradient!")
 
 ##################################
 # CLI implementation
@@ -94,17 +119,17 @@ def main():
     # run appropriate function
     if func_name == 'batch':
         test_batch_gradient_descent(conv_by_grad, eta, threshold, delta)
+    elif func_name == 'verify':
+        test_verify_gradient()
+    elif func_name == 'stoch':
+        test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
     else:
         if func_name == 'gauss':
             is_gaussian = True
         elif func_name != 'quad':
-            raise ValueError("must specify 'gauss', 'quad', or 'batch'")
+            raise ValueError("must specify func_name")
 
         simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta)
-
-    # if plot:
-    #     visualize(iterations, grad_norms)
-    # test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
 
 if __name__ == "__main__":
     if debug:
