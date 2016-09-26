@@ -75,7 +75,8 @@ def main():
         raise ValueError("must specify 'gauss' or 'quad'")
 
     # simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta)
-    test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
+    # test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
+    test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05)
 
 if __name__ == "__main__":
     if debug:
