@@ -8,13 +8,15 @@ import numpy as np
 import pylab as pl
 import matplotlib.pyplot as plt
 
-debug = True
+debug = False
+plot = False
 
 ##################################
 # Main Functions
 ##################################
 
-def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by_grad,
+def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.01, 
+                     delta = 0.000001, conv_by_grad = False,
                      stochastic = False):
     """
     gradient_descent
@@ -37,7 +39,7 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
     fx0 = 0 # last f(x)
     fx1 = float("inf") # current f(x)
 
-    # grad_norms = []
+    grad_norms = []
 
     while True:
         i = iterations % n
@@ -49,7 +51,7 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
             current_x, grad = update(gradient, current_x, eta)
 
         current_norm = np.linalg.norm(grad)
-        # grad_norms.append(current_norm)
+        grad_norms.append(current_norm)
 
         # estimate gradient norm, gradient
         # if stochastic:
@@ -80,7 +82,8 @@ def gradient_descent(x_init, objective, gradient, eta, threshold, delta, conv_by
     print("Converged after {} iterations\n".format(iterations))
     print("We updated to {}\n".format(current_x))
 
-    # plt.plot(range(iterations),grad_norms,'o')
+    if plot:
+        visualize(iterations, grad_norms)
 
     return (current_x, fx1)
 
@@ -138,7 +141,6 @@ def central_difference(f, x, delta, stochI=None):
 
         est_gradient.append((f_pos - f_neg) / delta)
     
-
     # return (np.linalg.norm(est_gradient), est_gradient)
     return np.array(est_gradient).reshape(n, 1)
 
@@ -165,6 +167,10 @@ def converge_delta_fx(fx0, fx1, threshold):
     """
     return abs(fx1 - fx0) < threshold
 
-##################################
-# Stochastic GD
-##################################
+def visualize(iterations, grad_norms):
+    # plot gradient over time
+    plt.plot(np.arange(iterations + 1),grad_norms, ".")
+    plt.xlabel("iterations")
+    plt.ylabel("gradient norm")
+
+    plt.show()

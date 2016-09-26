@@ -2,6 +2,7 @@ import sys
 
 import cProfile
 import numpy as np
+import math
 
 from gradientDescent import *
 
@@ -166,8 +167,6 @@ def stochastic_error(theta, i):
     # print("stoch error{}".format((xiT.dot(theta.reshape(10, 1))-yi) ** 2))
     return (xiT.dot(theta.reshape(10, 1))-yi) ** 2 
 
-
-
 ##################################
 # Part Testing
 ##################################
@@ -227,14 +226,17 @@ def main():
     is_gaussian = False
     conv_by_grad = False
 
-    if func_name == 'gauss':
-        is_gaussian = True
-    elif func_name != 'quad':
-        raise ValueError("must specify 'gauss' or 'quad'")
+    if func_name == 'batch':
+        test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05)
+    else:
+        if func_name == 'gauss':
+            is_gaussian = True
+        elif func_name != 'quad':
+            raise ValueError("must specify 'gauss', 'quad', or 'batch'")
 
-    # simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta)
+        simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta)
     # test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta)
-    test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05)
+    
 
 if __name__ == "__main__":
     if debug:
