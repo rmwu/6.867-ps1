@@ -45,11 +45,13 @@ where $A$ is positive-definite.
 % "Discuss (and illustrate) the effect of the choice of starting guess, the step size, and the convergence criterion on the resulting solution, as well as how the norm of the gradient evolves through the iteration.
 
 \subsection{Numerical Gradient Approximation}
+\label{subsec:grad-approx}
 
 Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. With our examples, these gradients had simple analyic forms, but such is not the case for general objective functions. Therefore, as a check on the user-specified gradient (or as a substitute for a user-specified gradient), we implemented a gradient approximation routine.
 
 Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at some given point~$x^*$ by approximating its partial derivatives as
 \begin{equation}
+\label{eq:grad-approx}
 \f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
 \end{equation}
 where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the values into our numerical gradient approximation. 
@@ -136,11 +138,37 @@ J(w) = \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2 = \f12 (\Phi w 
 \eeq
 which has gradient
 \beq
+\label{eq:sse-grad}
 \nabla J(w) = \Phi^T(\Phi w - Y).
 \eeq
+Using our numeric gradient approximation from section~\ref{subsec:grad-approx} (Equation~\ref{eq:grad-approx}), we verified the correctness of Equation~\ref{eq:sse-grad}.
 
+We proceeded to estimate the maximmum-likelihood weight vector $w$ (Equation~\ref{eq:max-likelihood-weights}), which minimizes squared sum error, using batch gradient descent.
+For small degree fits, the results agreed strongly with the closed-form solution.
+However, for higher degrees, the discrepancies between our maximum-likelihood fits and our gradient-descent estimate fits grew progressively larger (Figure~\ref{fig:bgd-poly-fits}).
+
+Interestingly, the gradient descent fits did not overfit nearly as much as the maximum-likelihood fits at high degree.
+We conjecture that this behavior arises because we initialize our weight vectors at 0, ``regularizing" our fits in a sense.
+Moreover, our gradient descent procedure terminates when the objective function changes between gradient descent iterations drops below a certain threshold, which we can think of as a form of early stopping.
+
+\begin{figure}[h]
+   \centering
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree1.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree4.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree7.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree10.pdf}
+   \caption{Polynomial fits by batch gradient descent of various degrees (green) of the dataset (blue) generated from a sum of cosines (yellow).
+   The fits agree perfectly with the maximum-likelihood fits (red) at low degrees, but differ increasingly for higher degrees.
+   }
+   \label{fig:bgd-poly-fits}
+\end{figure}
 
 % 2b/c
+
+% Use batch gradient descent on the SSE function on some values of M.
+% Describe your experience with initial guesses, step sizes and convergence thresholds.
+% Compare with using SGD on the same data.
+% Explain your results in terms of the properties of the function being optimized and the properties of the algorithms.
 
 % #PLACEHOLDER
 
