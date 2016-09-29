@@ -5,8 +5,8 @@
 \usepackage[nosetup, colorlinks]{tony}
 \usepackage{graphicx}
 
+\usepackage{amsmath,amssymb}
 \usepackage{mathpazo}
-\usepackage{amsmath}
 \usepackage{multicol}
 \usepackage{diagbox}
 
@@ -53,7 +53,7 @@ We present our results in Figure~\ref{fig:1.1}, where we illustrate the effect o
    \includegraphics[width=3in]{img/1-1-quad.pdf}
    \includegraphics[width=3in]{img/1-1-etaGauss.pdf}
    \includegraphics[width=3in]{img/1-1-etaQuad.pdf}
-   \caption{Effects of initial guess and step size on convergence. Bad initial guesses took much longer to converge (8428 and 5743 iterations) than good initial guesses (6292 and 372 iterations, respectively). The bottom two figures show the change in objective function over time. Larger step sizes (red and green) also converged faster, if they converged at all.}
+   \caption{Effects of initial guess and step size on convergence. Bad initial guesses took much longer to converge (8428 and 5743 iterations) than good initial guesses (6292 and 372 iterations, respectively). The bottom two figures show the change in objective function over time. Larger step sizes (red and green) converged faster, if at all.}
    \label{fig:1.1}
 \end{figure*}
 
@@ -74,7 +74,7 @@ We present our results in Figure~\ref{fig:1.1}, where we illustrate the effect o
 
 Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. In our examples, these gradients had simple analytic forms, but in general objective functions might have very complicated gradients. Therefore, as a check on (or as a substitute for) the user-specified gradient, we implemented a gradient approximation routine.
 
-We approximate the gradient of a general function~$f:\RR^d\to\RR$ at given point~$x^*$ by approximating its partial derivatives as the central difference
+We approximate the gradient of a general function~$f:\mathbb{R}^d\to\mathbb{R}$ at given point~$x^*$ by approximating its partial derivatives as the central difference
 \begin{equation}
 \label{eq:grad-approx}
 \f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
@@ -82,7 +82,7 @@ We approximate the gradient of a general function~$f:\RR^d\to\RR$ at given point
 where $\eps > 0$ is some small user-supplied difference step and $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the terms into our numerical gradient approximation. 
 
 Using our approximation procedure, we verified the analytic gradient calculations we made for the negative Gaussian and the quadratic bowl.
-We found that the routine produced the best approximations when $\eps$ was relatively close in order of magnitude to the points of interest. % pls elaborate %%%%%
+We obtained the best approximations when $\eps$ was on the order of the radius of curvature at the point of interest (indeed, tighter structure warrants a smaller $\eps$).
 Too small an~$\eps$ resulted in rounding errors and other numerical instability, while too large an~$\eps$ overstretched the secant approximation our procedure relies on.
 
 % this damn table disappears
@@ -111,15 +111,18 @@ where each $J_i$ is presumably a term corresponding to a single data point. Wher
 the SGD update step has the form
 \begin{equation} \theta_{t+1} = \theta_t - \eta_t \nabla J_i(\theta_t). \end{equation}
 
-Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while the objective function fluctuates as SGD runs, we eventually get convergence.
+Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$.
+More interestingly, our step size is now time-dependent.
+Because SGD is stochastic, it is unclear that SGD converges.
+But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence.
+Figure~\ref{fig:1.2} illustrates that while the objective function fluctuates as SGD runs, we eventually get convergence.
 
-We implemented SGD with two stopping criteria: either gradient norm or change in objective function drop below a provided threshold. In practice, we chose to set a threshold on change in objective function, since it is more readily interpretable.
+We implemented SGD with two stopping criteria: either gradient norm or change in objective function drop below a provided threshold.
+In practice, we chose to set a threshold on change in objective function, since it is more readily interpretable.
 % We set a learning rate schedule of the form
 
 % #PLACEHOLDER
 % TODO describe specific problem
-% TODO talk about learning rate schedule and stopping criterion we chose for specific problem
-
 
 
 % % % % % % % % % %
@@ -146,19 +149,21 @@ where $Y$ is a vector of $y^{(n)}$ values from our dataset and $\Phi$ is the des
 
 \subsection{Polynomial Basis Functions}
 
-We tested our procedure by performing fits on a dataset of 11 points with polynomial basis functions up to some specified degree $M$. The dataset was generated by applying noise to the values produced by the function
+We tested our procedure by performing fits on a dataset of 11 points with polynomial basis functions up to some specified degree $M$.
+The dataset was generated by applying noise to the values produced by the function
 \begin{equation}
 \label{eq:dataset-secret-func}
 y(x) = \cos(\pi x) + \cos(2\pi x).
 \end{equation}
-We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}. Note the obvious underfitting and overfitting introduced by models with excessively low or high degrees.
+We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}.
+Note the obvious underfitting and overfitting introduced by models with excessively low or high degrees.
 
-\begin{figure*} %  figure placement: here, top, bottom, or page
+\begin{figure*}
    \centering
-   \includegraphics[width=3in]{img/2-1_degree0.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/2-1_degree1.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/2-1_degree3.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/2-1_degree10.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/2-1_degree0.pdf}
+   \includegraphics[width=3in]{img/2-1_degree1.pdf}
+   \includegraphics[width=3in]{img/2-1_degree3.pdf}
+   \includegraphics[width=3in]{img/2-1_degree10.pdf}
    \caption{Plots of our polynomial basis fits for degrees $M=0,1,3,10$ (red) of our dataset (blue), which was generated from an underlying function (yellow).
    The degree ascends from top to bottom, and within each row, from left to right.}
    \label{fig:2.1-polybasis}
@@ -214,11 +219,12 @@ With a small dataset, it is more likely that the algorithm will believe it has c
 
 
 \subsection{Cosine Basis Functions}
+\label{subsec:cosine-basis}
 
 We also experimented with using cosine basis functions $\phi_m(x) = \cos(m\pi x)$ to fit the dataset.
 Recall that the values were generated from Equation~\ref{eq:dataset-secret-func}, so we expect our weights to be $(0, 1, 1, 0, \dots)$ (recall that the first term is the weight for $\phi_0(x) \equiv 1$, so it is a bias term).
 With a fit degree of~8, however, we overfitted significantly, and our weight vector differed greatly from the actual weights used to generate the data.
-In section~\ref{sec:lasso} we will see how to enforce sparsity on our models to produce better fits in certain scenarios.
+In section~\ref{sec:lasso} we will enforce sparsity on our linear models to produce better fits in certain scenarios.
 
 % elaborate??
 
@@ -249,7 +255,7 @@ w_{0, \tx{ridge}} = \overline Y - w_{+,\tx{ridge}}^T \overline \Phi
 
 We implemented ridge regression and tested it on the data from our previous experiments on regression for a variety of polynomial degrees and values of $\lambda$. We present some of the fits in Figure~\ref{fig:ridge}.
 
-\begin{figure*}[p] %  figure placement: here, top, bottom, or page
+\begin{figure*}
    \centering
    \newlength{\picwidth}
    \setlength{\picwidth}{2in}
@@ -337,8 +343,9 @@ Before concluding, observe from Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-
 \section{Sparsification with LASSO}
 \label{sec:lasso}
 
-In previous parts, we have encountered relatively simple closed-form answers.
-However, that is not always the case; for problems without such solutions, we may estimate sparse weights with the LASSO (least absolute shrinkage and selection operation).  % wtf does this mean
+In section~\ref{subsec:cosine-basis}, recall that we attempted a cosine basis fit of data generated by Equation~\ref{eq:dataset-secret-func}.
+The model overfit the data significantly, as was apparently graphically, so we might therefore consider regularization.
+Instead of ridge regression, however, we used the LASSO (least absolute shrinkage and selection operation), which enforces our prior beliefs about the sparsity of the weight vectors.
 
 Recall that in ridge regression, we modified our loss function to include a quadratic regularizer. We can generalize Equation~\ref{eq:moderr} (Bishop 3.29) to other exponents. In particular, when the exponent is 1, we have the LASSO error function:
 \begin{equation}J(w) = \f{1}{n}\sum_{i=1}^n{(y^{(i)}-w^T\phi(x^{(i)}))^2} + \lambda \sum_{j=1}^M{|w_j|}.\end{equation}
@@ -347,7 +354,7 @@ We evaluated LASSO against a dataset generated by a sparse linear combination of
 \begin{equation}
 \phi(x)=(x, \sin{(0.4\pi x\cdot1)},\dots,\sin({0.4\pi x\cdot 12})).
 \end{equation}
-In comparison with ridge regression and vanilla linear regression, weights produced by LASSO were sparse (as expected, since the underlying generator was sparse)---most coefficients $w_j$ were driven to 0 as $\lambda$ increased.
+In comparison with ridge regression and vanilla linear regression, weights produced by LASSO were sparse (as expected, since the underlying generator was sparse)---most coefficients $w_j$ were driven to 0 as $\lambda$ increased; such was not the case with ridge regression, which we also tested.
 Consequently, LASSO fits generalized better, as is apparent from Figure~\ref{fig:lasso-weights}.
 
 \begin{figure*}
