@@ -63,7 +63,7 @@ We present our results in Figure~\ref{fig:1.1}, where we illustrate the effect o
    \includegraphics[width=3in]{img/1-1-stoch.pdf}
    \includegraphics[width=3in]{img/1-1-batch-func.pdf}
    \includegraphics[width=3in]{img/1-1-stoch-func.pdf}
-   \caption{Batch gradient descent (left) and stochastic gradient descent (right). We see that SGD requires more iterations to converge and fluctuates more, in both objective function and gradient, than batch gradient descent.} % on which objective function?
+   \caption{Batch gradient descent (left) and stochastic gradient descent (right) on the sum of squares error for linear regression on real vectors in 10 dimensions. We see that SGD requires more iterations to converge and fluctuates more, in both objective function and gradient, than batch gradient descent.} % on which objective function?
    \label{fig:1.2}
 \end{figure*}
 
@@ -111,7 +111,7 @@ where each $J_i$ is presumably a term corresponding to a single data point. Wher
 the SGD update step has the form
 \begin{equation} \theta_{t+1} = \theta_t - \eta_t \nabla J_i(\theta_t). \end{equation}
 
-Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while the objective function fluctuates as SGD runs, we eventually get convergence.
+Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while the objective function (squared error) fluctuates as SGD runs, we eventually get convergence.
 
 We implemented SGD with two stopping criteria: either gradient norm or change in objective function drop below a provided threshold. In practice, we chose to set a threshold on change in objective function, since it is more readily interpretable.
 % We set a learning rate schedule of the form
@@ -337,7 +337,7 @@ Before concluding, observe from Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-
 \section{Sparsification with LASSO}
 \label{sec:lasso}
 
-In previous parts, we have encountered relatively simple closed-form answers.
+In previous parts, we have encountered relatively simple closed-form answers
 However, that is not always the case; for problems without such solutions, we may estimate sparse weights with the LASSO (least absolute shrinkage and selection operation).  % wtf does this mean
 
 Recall that in ridge regression, we modified our loss function to include a quadratic regularizer. We can generalize Equation~\ref{eq:moderr} (Bishop 3.29) to other exponents. In particular, when the exponent is 1, we have the LASSO error function:
