@@ -42,7 +42,28 @@ and a quadratic bowl
 \begin{equation}
 f(x; A, b) = \frac{1}{2}x^T Ax - x^T b,
 \end{equation}
-where $A$ is positive-definite.
+where $A$ is positive-definite. For this exercise, our Gaussian was tested with $\mu = (10, 10)^T$, $\Sigma = 1000 \cdot I_2$. For the quadratic bowl, we took \[A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)\] and $b = (400, 400)^T$. Figure \ref{fig:1.1} illustrates the effect of the initial guess and step size for convergence given these values.
+
+\begin{figure*}%  figure placement: here, top, bottom, or page
+   \centering
+   \includegraphics[width=3in]{img/1-1-gauss.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-quad.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-etaGauss.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-etaQuad.pdf}  % $PLACEHOLDER
+   \caption{Effects of initial guess and step size on convergence. Bad initial guesses took much longer to converge (8428 and 5743 iterations) than good initial guesses (6292 and 372 iterations, respectively). The bottom two figures show the change in objective function over time. Larger step sizes (red and green) also converged faster, if they converged at all.}
+   \label{fig:1.1}
+\end{figure*}
+
+\begin{figure*}%  figure placement: here, top, bottom, or page
+   \centering
+   \includegraphics[width=3in]{img/1-1-batch.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-stoch.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-batch-func.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-stoch-func.pdf}  % $PLACEHOLDER
+   \caption{Batch gradient descent (left) and stochastic gradient descent (right). We see that SGD descent requires more iterations to converge and fluctuates more, in both objective function and gradient, than BGD.}
+   \label{fig:1.2}
+\end{figure*}
+
 
 % TODO Do something with this
 % For the Gaussian, we had $\mu = (10, 10)^T$, $\Sigma = \left(\begin{array}{cc}1000 & 0 \\0 & 1000\end{array}\right)$. For the quadratic bowl, we had $A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)$ and $b = (400, 400)^T$.
@@ -68,7 +89,18 @@ where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i
 % TODO
 % "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
 
-We note that decreasing the difference step increases the accuracy of the gradient evaluation, until round-off errors again decrease said accuracy around [todo].
+We note that decreasing the difference step produces a most accurate guess when it is relatively close in order of magnitude to the points of interest.
+
+% this damn table disappears
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}\hline
+\label{tab:1.2}
+$\epsilon$ & 1000 & 100 & 10 & 1e-4 \\ \hline
+MSE & 2.0e-17 & 1.4e-18 & 3.8e-18 & 2.1e-12 \\
+ \hline
+\end{tabular}
+\end{center}
 
 \subsection{Stochastic Gradient Descent}
 
@@ -85,8 +117,9 @@ where each $J_i$ is presumably a term corresponding to a single data point. Wher
 the SGD update step has the form
 \begin{equation} \theta_{t+1} = \theta_t - \eta_t \nabla J_i(\theta_t). \end{equation}
 
-Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence.
+Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while SGD fluctuates during convergence, it eventually does converge, like GBD.
 
+In this case, we 
 % #PLACEHOLDER
 % TODO describe specific problem
 % TODO talk about learning rate schedule and stopping criterion we chose for specific problem
