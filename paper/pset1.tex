@@ -10,6 +10,10 @@
 \usepackage{multicol}
 \usepackage{diagbox}
 
+%\usepackage{xcolor}
+%\usepackage[printwatermark]{xwatermark}
+%\newwatermark*[allpages,color=gray!50,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
+
 
 \title{6.867: Problem Set 1}
 \date{September 29, 2016}
@@ -26,7 +30,8 @@
 
 \subsection{Batch Gradient Descent}
 
-We implemented a general-purpose batch gradient descent as described in Bishop 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion. % TODO elaborate on this?
+We implemented a general-purpose batch gradient descent procedure, as described in Bishop 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion.
+We elected to terminate once the objective function change fell below a given threshold.
 We tested our implementation against two functions: a sign-reversed multivariate Gaussian with mean~$\mu$ and covariance matrix~$\Sigma$
 \begin{equation}
 f(x; \mu, \Sigma) = -\frac{e^{-\frac12(x - \mu)^T \Sigma^{-1}(x - \mu)}}{\sqrt{(2\pi)^n \det\Sigma}}
@@ -35,54 +40,50 @@ and a quadratic bowl
 \begin{equation}
 f(x; A, b) = \frac{1}{2}x^T Ax - x^T b,
 \end{equation}
-where $A$ is positive-definite. For this exercise, our Gaussian was tested with $\mu = (10, 10)^T$, $\Sigma = 1000 \cdot I_2$. For the quadratic bowl, we took \[A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)\] and $b = (400, 400)^T$. Figure \ref{fig:1.1} illustrates the effect of the initial guess and step size for convergence given these values.
+where $A$ is positive-definite.
+For this exercise, our Gaussian parameters were $\mu = (10, 10)^T$, $\Sigma = 1000 \cdot I_2$.
+For the quadratic bowl, we took
+\[A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)\]
+and $b = (400, 400)^T$.
+We present our results in Figure~\ref{fig:1.1}, where we illustrate the effect of the initial guess and step size for convergence on these two objective functions.
 
-\begin{figure*}%  figure placement: here, top, bottom, or page
+\begin{figure*}
    \centering
-   \includegraphics[width=3in]{img/1-1-gauss.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-quad.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-etaGauss.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-etaQuad.pdf}  % $PLACEHOLDER
+   \includegraphics[width=3in]{img/1-1-gauss.pdf}
+   \includegraphics[width=3in]{img/1-1-quad.pdf}
+   \includegraphics[width=3in]{img/1-1-etaGauss.pdf}
+   \includegraphics[width=3in]{img/1-1-etaQuad.pdf}
    \caption{Effects of initial guess and step size on convergence. Bad initial guesses took much longer to converge (8428 and 5743 iterations) than good initial guesses (6292 and 372 iterations, respectively). The bottom two figures show the change in objective function over time. Larger step sizes (red and green) also converged faster, if they converged at all.}
    \label{fig:1.1}
 \end{figure*}
 
-\begin{figure*}%  figure placement: here, top, bottom, or page
+\begin{figure*}
    \centering
-   \includegraphics[width=3in]{img/1-1-batch.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-stoch.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-batch-func.pdf}  % $PLACEHOLDER
-   \includegraphics[width=3in]{img/1-1-stoch-func.pdf}  % $PLACEHOLDER
-   \caption{Batch gradient descent (left) and stochastic gradient descent (right). We see that SGD descent requires more iterations to converge and fluctuates more, in both objective function and gradient, than batch gradient descent.}
+   \includegraphics[width=3in]{img/1-1-batch.pdf}
+   \includegraphics[width=3in]{img/1-1-stoch.pdf}
+   \includegraphics[width=3in]{img/1-1-batch-func.pdf}
+   \includegraphics[width=3in]{img/1-1-stoch-func.pdf}
+   \caption{Batch gradient descent (left) and stochastic gradient descent (right). We see that SGD requires more iterations to converge and fluctuates more, in both objective function and gradient, than batch gradient descent.} % on which objective function?
    \label{fig:1.2}
 \end{figure*}
 
 
-% TODO Do something with this
-% For the Gaussian, we had $\mu = (10, 10)^T$, $\Sigma = \left(\begin{array}{cc}1000 & 0 \\0 & 1000\end{array}\right)$. For the quadratic bowl, we had $A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)$ and $b = (400, 400)^T$.
-
-% #PLACEHOLDER
-% TODO
-% present results of experiments
-% "Discuss (and illustrate) the effect of the choice of starting guess, the step size, and the convergence criterion on the resulting solution, as well as how the norm of the gradient evolves through the iteration.
 
 \subsection{Numerical Gradient Approximation}
 \label{subsec:grad-approx}
 
-Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. With our examples, these gradients had simple analytic forms, but such is not the case for general objective functions. Therefore, as a check on (or a substitute for) the user-specified gradient, we implemented a gradient approximation routine.
+Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. In our examples, these gradients had simple analytic forms, but in general objective functions might have very complicated gradients. Therefore, as a check on (or as a substitute for) the user-specified gradient, we implemented a gradient approximation routine.
 
-Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at some given point~$x^*$ by approximating its partial derivatives as the central difference
+We approximate the gradient of a general function~$f:\RR^d\to\RR$ at given point~$x^*$ by approximating its partial derivatives as the central difference
 \begin{equation}
 \label{eq:grad-approx}
 \f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
 \end{equation}
-where $\eps > 0$ is some user-supplied small difference step and $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the terms into our numerical gradient approximation. 
+where $\eps > 0$ is some small user-supplied difference step and $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the terms into our numerical gradient approximation. 
 
-% #PLACEHOLDER
-% TODO
-% "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
-
-Numerically we noted that the difference step produced the best guess when it was relatively close in order of magnitude to the points of interest. Too small a step resulted in rounding inaccuracies, while too large a step overstretched the assumption that the function could be approximated by a hyperplane at the point.
+Using our approximation procedure, we verified the analytic gradient calculations we made for the negative Gaussian and the quadratic bowl.
+We found that the routine produced the best approximations when $\eps$ was relatively close in order of magnitude to the points of interest. % pls elaborate %%%%%
+Too small an~$\eps$ resulted in rounding errors and other numerical instability, while too large an~$\eps$ overstretched the secant approximation our procedure relies on.
 
 % this damn table disappears
 
@@ -97,7 +98,7 @@ Numerically we noted that the difference step produced the best guess when it wa
 
 \subsection{Stochastic Gradient Descent}
 
-By design, batch gradient descent determines each update step by looking at the entire dataset and taking a gradient. This approach clearly becomes unfeasible with large datasets, and does not extend easily to online settings. For these reasons, we instead use stochastic gradient descent (SGD), in which we approximate the gradient as follows.
+By design, batch gradient descent determines each update step by looking at the entire dataset and taking a gradient. This approach becomes unfeasible with large datasets, and does not extend easily to online settings. For these reasons, we instead use stochastic gradient descent (SGD), in which we approximate the gradient as follows.
 
 Suppose our objective function takes the form
 \begin{equation}
@@ -110,13 +111,14 @@ where each $J_i$ is presumably a term corresponding to a single data point. Wher
 the SGD update step has the form
 \begin{equation} \theta_{t+1} = \theta_t - \eta_t \nabla J_i(\theta_t). \end{equation}
 
-Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while SGD fluctuates during convergence, it eventually does converge, like batch gradient descent.
+Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while the objective function fluctuates as SGD runs, we eventually get convergence.
 
-We implemented two stopping criteria: either gradient norm or change in objective function drop below a provided threshold. We chose to use the change in objective function to avoid issues around objective functions are are very nearly flat everywhere.
+We implemented SGD with two stopping criteria: either gradient norm or change in objective function drop below a provided threshold. In practice, we chose to set a threshold on change in objective function, since it is more readily interpretable.
+% We set a learning rate schedule of the form
+
 % #PLACEHOLDER
 % TODO describe specific problem
 % TODO talk about learning rate schedule and stopping criterion we chose for specific problem
-% TODO part 1c
 
 
 
@@ -126,9 +128,9 @@ We implemented two stopping criteria: either gradient norm or change in objectiv
 
 \section{Linear Regression}
 
-Before we proceed, recall that a linear basis function model for a dataset $(x^{(n)},y^{(n)})$ given a fixed set of basis functions $\phi_i$ is a regression model that tries to find weights~$w_i$ for which we approximately have
+Before proceeding, recall that a linear basis function model for a dataset $(x^{(n)}, y^{(n)})$ given a fixed set of basis functions $\phi_i$ is a regression model that tries to find weights~$w_i$ for which we approximately have
 \[ y^{(n)} = w_0 + \sum_i w_i \phi_i(x^{(n)}). \]
-In other words, we transform the independent variable $x$ by basis functions~$\phi_i$, then perform linear regression with independent variables $\phi_i(x)$ and dependent variable~$y$.
+In other words, we transform the independent variable $x$ by basis functions~$\phi_i$ into some feature space, then perform linear regression with independent variables $\phi_i(x)$ and dependent variable~$y$.
 
 We wrote a procedure for general linear basis function regression with user-specified data points and basis functions that found the maximum-likelihood weight vector analytically, via Bishop Equation 3.15, which we restate here:
 \begin{equation}
@@ -147,7 +149,7 @@ We tested our procedure by performing fits on a dataset of 11 points with polyno
 \label{eq:dataset-secret-func}
 y(x) = \cos(\pi x) + \cos(2\pi x).
 \end{equation}
-We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}. Note the obvious underfitting and overfitting introduced by using models with excessively low or high degrees.
+We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}. Note the obvious underfitting and overfitting introduced by models with excessively low or high degrees.
 
 \begin{figure*} %  figure placement: here, top, bottom, or page
    \centering
@@ -174,17 +176,17 @@ which has gradient
 \label{eq:sse-grad}
 \nabla J(w) = \Phi^T(\Phi w - Y).
 \eeq
-Using our numeric gradient approximation from section~\ref{subsec:grad-approx} (Equation~\ref{eq:grad-approx}), we verified the correctness of Equation~\ref{eq:sse-grad}.
+We verified the correctness of Equation~\ref{eq:sse-grad} with our numeric gradient approximation from section~\ref{subsec:grad-approx}.
 
 We proceeded to estimate the maximum-likelihood weight vector $w_\tx{ml}$ (Equation~\ref{eq:max-likelihood-weights}), which minimizes $J(w)$, using batch gradient descent on the SSE.
-For small degree fits, the results agreed strongly with the closed-form solution.
-However, for higher degrees, the discrepancies between our maximum-likelihood fits and our gradient-descent estimate fits grew progressively larger (Figure~\ref{fig:bgd-poly-fits}).
+For small degree fits, results agreed strongly with the closed-form solution.
+However, for higher degrees, discrepancies grew between our maximum-likelihood fits and our gradient-descent estimate fits (Figure~\ref{fig:bgd-poly-fits}).
 
 \begin{figure*}[h]
    \centering
-   \includegraphics[width=2in]{img/2-3_bgd_fit_degree1.pdf}
-   \includegraphics[width=2in]{img/2-3_bgd_fit_degree4.pdf}
-   \includegraphics[width=2in]{img/2-3_bgd_fit_degree7.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree1.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree4.pdf}
+   \includegraphics[width=2.25in]{img/2-3_bgd_fit_degree7.pdf}
    \caption{Polynomial fits of various degrees by batch gradient descent (green) of the dataset (blue) generated from a sum of cosines (yellow).
    The fits agree perfectly with the maximum-likelihood fits (red) at low degrees, but differ increasingly for higher degrees.
    Weights were initialized to zero.
@@ -193,18 +195,18 @@ However, for higher degrees, the discrepancies between our maximum-likelihood fi
 \end{figure*}
 
 Interestingly, the gradient descent fits did not overfit nearly as much as the maximum-likelihood fits at high degree.
-We conjecture that this behavior arises because we initialize our weight vectors at 0, ``regularizing" our fits in a sense.
-Indeed, initializing our weight vectors to very large (in absolute value) random numbers produced wildly varying polynomials as fits.
+This behavior likely arises because we initialize our weight vectors at 0, ``regularizing" our fits in a sense.
+Indeed, initializing our weight vectors to very large (in absolute value) random numbers produced very high-variance fits.
 
 Moreover, our gradient descent procedure terminates when the objective function changes between gradient descent iterations drops below a certain threshold, which we can think of as a form of early stopping.
 Intuitively, overfitting requires a large change in our model parameters to get small decreases in our loss function; our convergence criterion prevents this sort of micro-optimization from occurring.
 
 Varying step size had little effect at any degree.
-Larger step sizes led to marginally faster convergence; overly large step sizes, however, led to divergence.
+Larger step sizes led to modest performance gains; overly large step sizes, however, led to divergence.
 Varying the convergence threshold did not change our results significantly either (unless we set them unreasonably small or large).
 
-We repeated this analysis with stochastic gradient descent (SGD), which was much more sensitive to the initial guess we provided.
-Unless we initialized our weights closed to the correct (maximum-likelihood) value, SGD produced very poor fits at any degree.
+We repeated this analysis with stochastic gradient descent (SGD), which was much more sensitive to our initial guess.
+Unless we initialized our weights closed to the correct (maximum-likelihood) value, SGD produced very poor fits, even at low degree.
 At higher degrees, even picking initial weights close to their correct value did not seem to help with convergence.
 
 This behavior can be explained if we consider the size of our dataset.
@@ -216,6 +218,7 @@ With a small dataset, it is more likely that the algorithm will believe it has c
 We also experimented with using cosine basis functions $\phi_m(x) = \cos(m\pi x)$ to fit the dataset.
 Recall that the values were generated from Equation~\ref{eq:dataset-secret-func}, so we expect our weights to be $(0, 1, 1, 0, \dots)$ (recall that the first term is the weight for $\phi_0(x) \equiv 1$, so it is a bias term).
 With a fit degree of~8, however, we overfitted significantly, and our weight vector differed greatly from the actual weights used to generate the data.
+In section~\ref{sec:lasso} we will see how to enforce sparsity on our models to produce better fits in certain scenarios.
 
 % elaborate??
 
@@ -228,9 +231,9 @@ With a fit degree of~8, however, we overfitted significantly, and our weight vec
 
 Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modified version of Equation~\ref{eq:sse} (Bishop Equation~3.27):
 \begin{equation}\label{eq:moderr}
-J(w) = \f12 (\Phi w - Y)^T (\Phi w - Y) + \f12 \lambda ||w_+||^2,
+J(w) = \f12 (\Phi w - Y)^T (\Phi w - Y) + \f12 \lambda |w_+|^2,
 \end{equation}
-where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. So now we are penalizing large weights.
+where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. The extra term penalizes large weights.
 
 Then it can be shown that the optimal weight vector is given by
 \begin{equation}
@@ -248,13 +251,15 @@ We implemented ridge regression and tested it on the data from our previous expe
 
 \begin{figure*}[p] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=2in]{img/3-1_ridge_lambd3_degree1.pdf}
-   \includegraphics[width=2in]{img/3-1_ridge_lambd3_degree3.pdf}
-   \includegraphics[width=2in]{img/3-1_ridge_lambd3_degree6.pdf}
-   \includegraphics[width=2in]{img/3-1_ridge_lambd30_degree1.pdf}
-   \includegraphics[width=2in]{img/3-1_ridge_lambd30_degree3.pdf}
-   \includegraphics[width=2in]{img/3-1_ridge_lambd30_degree6.pdf}
-   \caption{Regularized (green) and non-regularized (red) polynomial fits for the dataset from the previous section.}
+   \newlength{\picwidth}
+   \setlength{\picwidth}{2in}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd3_degree1.pdf}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd3_degree3.pdf}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd3_degree6.pdf}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd30_degree1.pdf}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd30_degree3.pdf}
+   \includegraphics[width=\picwidth]{img/3-1_ridge_lambd30_degree6.pdf}
+   \caption{Regularized (green) and non-regularized (red) polynomial fits for the sum-of-cosines dataset.}
    \label{fig:ridge}
 \end{figure*}
 
@@ -263,15 +268,17 @@ Note that when fitting with higher order polynomial bases, even small values of 
 
 \subsection{Model Selection}
 
-We now turn our attention to another dataset, again of pairs of real numbers. This dataset has already been partitioned into sets $A$, $B$, and $V$, with respective sizes 13, 10, and 22. We will use $V$ as our validation set. We will try to model this data with a polynomial fit, as before, except we will be using regularization.
+We now turn our attention to another dataset, again of pairs of real numbers.
+This dataset has been partitioned into sets $A$, $B$, and $V$, with respective sizes 13, 10, and 22, and is plotted in Figure~\ref{fig:3-2-bestfit}.
+We will use $V$ as our validation set. We will try to model this data with a polynomial fit, as before, except we will be using regularization.
 
 We used $A$ as training data and $B$ as test data, then vice versa.
-In each case, we found the optimal weights using Equations~\ref{eq:ridge-weights} and \ref{eq:ridge-bias} on the training data for many values of the degree $M$ of the polynomial basis and the regularization parameter $\lambda$. We picked the pair $(M^*, \lambda^*)$ that produced the weight vector with the best performance on the \emph{validation} data, then evaluated the model they produced on the test data.
-Note that we evaluate performance of an actual weight vector with ordinary mean-square error (MSE; Equation~\ref{eq:sse}, but normalized by the number of data points), with \emph{no regularization term}.
+In each case, we found the optimal weights by Equations~\ref{eq:ridge-weights} and \ref{eq:ridge-bias} on training data for many values of the degree $M$ of the polynomial basis and the regularization parameter $\lambda$. We chose the $(M^*, \lambda^*)$ that produced the lowest \emph{validation} error, then evaluated the model on test data.
+Note that we evaluate performance of an actual weight vector with ordinary mean-square error (MSE; Equation~\ref{eq:sse} normalized by the number of data points), with \emph{no regularization term}.
 
-We present validation errors for a variety of $M$ and $\lambda$ in Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b}.
-When we trained on $A$ and tested on $B$, the hyperparameters that produced the smallest MSE on validation were $(M^*,\lambda^*)=(2,0)$; the MSE was $0.05336$. On test data $B$, the same model achieved an MSE of $1.28765$.
-When we trained on $B$ and tested on $A$, the best hyperparameters $(M^*,\lambda^*)=(3,0.6)$ produced a validation error of $0.65195$. The test error on the same model was $1.51697$.
+We present the validation errors we obtained in Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b}.
+When we trained on $A$ and tested on $B$, the best hyperparameters were $(M^*,\lambda^*)=(2,0)$; the validation MSE was $0.05336$, and the test MSE was $1.28765$.
+When we trained on $B$ and tested on $A$, the best hyperparameters $(M^*,\lambda^*)=(3,0.6)$ produced a validation MSE of $0.65195$ and a test MSE of $1.51697$.
 We plot these two best-fit models in Figure~\ref{fig:3-2-bestfit}.
 
 
@@ -320,7 +327,7 @@ We plot these two best-fit models in Figure~\ref{fig:3-2-bestfit}.
    \label{fig:3-2-bestfit}
 \end{figure*}
 
-Before concluding this section, we observe from Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b} that increasing the degrees of freedom in our model increases the optimal value of $\lambda$.
+Before concluding, observe from Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b} that increasing the degrees of freedom in our model increases the optimal $\lambda$. Indeed, more degrees of freedom require more regularization to prevent overfitting.
 
 
 % % % % % % % % % %
@@ -328,24 +335,27 @@ Before concluding this section, we observe from Tables~\ref{tab:val-mse-a} and \
 % % % % % % % % % %
 
 \section{Sparsification with LASSO}
+\label{sec:lasso}
 
-% #PLACEHOLDER
-In previous parts, we have encountered relatively simple closed-form answers. However, that is not always the case; for problems without such solutions, we may estimate sparse weights with the LASSO (least absolute shrinkage and selection operation).
+In previous parts, we have encountered relatively simple closed-form answers.
+However, that is not always the case; for problems without such solutions, we may estimate sparse weights with the LASSO (least absolute shrinkage and selection operation).  % wtf does this mean
 
-Recall that in ridge regression, we modified our error to include a quadratic regularizer. We can generalize Equation~\ref{eq:moderr} (Bishop 3.29) to other exponents. In particular, when the exponent is 1, we have the LASSO error function:
+Recall that in ridge regression, we modified our loss function to include a quadratic regularizer. We can generalize Equation~\ref{eq:moderr} (Bishop 3.29) to other exponents. In particular, when the exponent is 1, we have the LASSO error function:
 \begin{equation}J(w) = \f{1}{n}\sum_{i=1}^n{(y^{(i)}-w^T\phi(x^{(i)}))^2} + \lambda \sum_{j=1}^M{|w_j|}.\end{equation}
 
-We implemented LASSO and ran it against a dataset generated by a sparse linear combination of the 13 basis functions
+We evaluated LASSO against a dataset generated by a sparse linear combination of the 13 basis functions
 \begin{equation}
-\phi(x)=(x, \sin{(0.4\pi x\cdot1)},\dots,\sin({0.4\pi x\cdot 12}))
+\phi(x)=(x, \sin{(0.4\pi x\cdot1)},\dots,\sin({0.4\pi x\cdot 12})).
 \end{equation}
-In comparison with ridge regression and vanilla linear regression, the weights produced by LASSO were much sparser---most coefficients $w_j$ were driven to 0 as $\lambda$ increased. As a result, we see that LASSO fits generalized better, as we can see from Figure~\ref{fig:lasso-weights}.
+In comparison with ridge regression and vanilla linear regression, weights produced by LASSO were sparse (as expected, since the underlying generator was sparse)---most coefficients $w_j$ were driven to 0 as $\lambda$ increased.
+Consequently, LASSO fits generalized better, as is apparent from Figure~\ref{fig:lasso-weights}.
 
 \begin{figure*}
    \centering
-   \includegraphics[width=2.5in]{img/4-1-weights.pdf}
-   \includegraphics[width=2.5in]{img/4-1-fits.pdf}
-   \caption{(Left) The weights produced by LASSO (solid) and ridge regression (dotted) as their regularization parameters vary. Note how LASSO drives most weights to zero. (Right) Various linear-model fits of the training data. Note how LASSO generalizes much better to the test and validation datasets.}
+   \includegraphics[width=2.25in]{img/4-1-lasso-weights.pdf}
+   \includegraphics[width=2.25in]{img/4-1-ridge-weights.pdf}
+   \includegraphics[width=2.25in]{img/4-1-fits.pdf}
+   \caption{The weights produced by LASSO (left) and ridge regression (center) as their regularization parameters vary. Note how LASSO drives most weights to zero, and how linear changes to $\lambda$ result in linear changes to the weights (the curvature is an artifact of our horizontal log axis). (Right) Various linear-model fits of the training data. Note how LASSO generalizes much better to the test and validation datasets.}
    \label{fig:lasso-weights}
 \end{figure*}
 
