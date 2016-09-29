@@ -7,10 +7,10 @@
 
 \begin{document}
 
-\begin{abstract}
-% #PLACEHOLDER
-MY ABSTRACT HERE summary summary
-\end{abstract}
+%\begin{abstract}
+%% #PLACEHOLDER
+%MY ABSTRACT HERE summary summary
+%\end{abstract}
 
 \maketitle
 
@@ -25,7 +25,7 @@ MY ABSTRACT HERE summary summary
 
 \subsection{Batch Gradient Descent}
 
-We implemented a general-purpose batch gradient descent as described in Bishop, section 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion. % TODO elaborate on this?
+We implemented a general-purpose batch gradient descent as described in Bishop 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion. % TODO elaborate on this?
 We tested our implementation against two functions: a sign-reversed multivariate Gaussian with mean~$\mu$ and covariance matrix~$\Sigma$
 \begin{equation}
 f(x; \mu, \Sigma) = -\frac{1}{\sqrt{(2\pi)^n \det\Sigma}}\exp\left( -\frac12(x - \mu)^T \Sigma^{-1}(x - \mu) \right)
@@ -120,7 +120,7 @@ We plot the results of these fits for varying values of degree~$M$ in Figure~\re
    \includegraphics[width=2.25in]{img/2-1_degree1.pdf}  % $PLACEHOLDER
    \includegraphics[width=2.25in]{img/2-1_degree3.pdf}  % $PLACEHOLDER
    \includegraphics[width=2.25in]{img/2-1_degree10.pdf}  % $PLACEHOLDER
-   \caption{Plots of our polynomial basis fits for degrees $M=0,1,3,10$. The degree ascends from top to bottom, and within each row, from left to right.}
+   \caption{Plots of our polynomial basis fits for degrees $M=0,1,3,10$. The degree ascends from top to bottom, and within each row, from left to right. The red curves are the polynomial fits; the yellow curve is the actual function used to generate the dataset, which is plotted in blue.}
    \label{fig:2.1-polybasis}
 \end{figure}
 
@@ -131,11 +131,11 @@ Though there is a closed-form formula for the best-fit weight vector (Equation~\
 
 To this end, we considered the sum-of-squares error (SSE) for our problem:
 \beq
-J(w) = \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2,
+J(w) = \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2 = \f12 (\Phi w - Y)^T(\Phi w - Y),
 \eeq
 which has gradient
 \beq
-\nabla J(w) = 
+\nabla J(w) = \Phi^T(\Phi w - Y).
 \eeq
 
 
