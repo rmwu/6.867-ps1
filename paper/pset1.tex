@@ -129,7 +129,9 @@ We implemented SGD with two stopping criteria: either gradient norm or change in
 \section{Linear Regression}
 
 Before proceeding, recall that a linear basis function model for a dataset $(x^{(n)}, y^{(n)})$ given a fixed set of basis functions $\phi_i$ is a regression model that tries to find weights~$w_i$ for which we approximately have
-\[ y^{(n)} = w_0 + \sum_i w_i \phi_i(x^{(n)}). \]
+\beq
+y^{(n)} = w_0 + \sum_i w_i \phi_i(x^{(n)}).
+\eeq
 In other words, we transform the independent variable $x$ by basis functions~$\phi_i$ into some feature space, then perform linear regression with independent variables $\phi_i(x)$ and dependent variable~$y$.
 
 We wrote a procedure for general linear basis function regression with user-specified data points and basis functions that found the maximum-likelihood weight vector analytically, via Bishop Equation 3.15, which we restate here:
@@ -201,9 +203,7 @@ Indeed, initializing our weight vectors to very large (in absolute value) random
 Moreover, our gradient descent procedure terminates when the objective function changes between gradient descent iterations drops below a certain threshold, which we can think of as a form of early stopping.
 Intuitively, overfitting requires a large change in our model parameters to get small decreases in our loss function; our convergence criterion prevents this sort of micro-optimization from occurring.
 
-Varying step size had little effect at any degree.
-Larger step sizes led to modest performance gains; overly large step sizes, however, led to divergence.
-Varying the convergence threshold did not change our results significantly either (unless we set them unreasonably small or large).
+Varying the step size and the convergence threshold had little effect at any degree, unless we changed the parameters by many orders of magnitude. (e.g. large step sizes can lead to divergence)
 
 We repeated this analysis with stochastic gradient descent (SGD), which was much more sensitive to our initial guess.
 Unless we initialized our weights closed to the correct (maximum-likelihood) value, SGD produced very poor fits, even at low degree.
@@ -229,11 +229,11 @@ In section~\ref{sec:lasso} we will see how to enforce sparsity on our models to 
 
 \section{Ridge Regression}
 
-Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modified version of Equation~\ref{eq:sse} (Bishop Equation~3.27):
+Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modification of Equation~\ref{eq:sse} (Bishop Equation~3.27):
 \begin{equation}\label{eq:moderr}
 J(w) = \f12 (\Phi w - Y)^T (\Phi w - Y) + \f12 \lambda |w_+|^2,
 \end{equation}
-where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. The extra term penalizes large weights.
+where $w_+$ is the weight vector~$w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. The extra term penalizes large weights.
 
 Then it can be shown that the optimal weight vector is given by
 \begin{equation}
