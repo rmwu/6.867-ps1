@@ -4,6 +4,7 @@ Problem 1. Implement Gradient Descent
 """
 from __future__ import division
 import numpy as np
+import random
 
 import pylab as pl
 
@@ -41,7 +42,8 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
     delta_objectives = []
 
     while True:
-        i = iterations % n
+        # i = iterations % n
+        i = random.randrange(n)
         t = iterations # t, as in handout
 
         if stochastic:
