@@ -15,18 +15,21 @@ from run_grad_descent import simple_gradient_descent, test_batch_gradient_descen
 
 def vary_eta(conv_type):
     etas = [1e-2, 1e-3, 1e-4] # eta
-    threshold = 1e-3 # convergence threshold
-    is_gaussian = False # quad bowl
+    threshold = 1e-5 # convergence threshold
+    is_gaussian = True # quad bowl
     # converge by change in objective
     conv_by_grad = True if conv_type == "grad" else False
+
+    # make sure sufficiently far away
+    starting_guess = np.array([0.5,0.5])
 
     outputs = [] # nested list
 
     for eta in etas:
         outputs.append(simple_gradient_descent(
-            is_gaussian, conv_by_grad, eta, threshold))
+            is_gaussian, conv_by_grad, eta, threshold, starting_guess = starting_guess))
 
-    visualize(outputs, conv_type)
+    # visualize(outputs, conv_type)
 
 def vary_starting_guess(conv_type):
     eta = 1e-2
@@ -74,7 +77,7 @@ def visualize(outputs, conv_type):
     for output, color in list(zip(outputs, colors)):
         current_x, fx1, iterations, grad_norms, delta_obj = output
 
-        delta_obj = list(map(math.log, [abs(delta) for delta in delta_obj]))
+        # delta_obj = list(map(math.log, [abs(delta) for delta in delta_obj]))
         y_values = grad_norms if conv_type == "grad" else delta_obj
 
         plt.plot(np.arange(iterations + 1), y_values, color=color)

@@ -66,6 +66,7 @@ def negative_gaussian(x):
     
     exponent = -1/2 * (x - mu).T.dot(np.linalg.inv(sigma)).dot(x - mu)
 
+    # print( -1 * gaussian_normalization * math.exp(exponent))
     return -1 * gaussian_normalization * math.exp(exponent)
 
 def d_quadratic_bowl(x):
@@ -120,10 +121,10 @@ def squared_error(theta):
     return np.linalg.norm(x_data.dot(theta) - y_data) ** 2
 
 def d_stochastic_error(theta, i):
-    xi = x_data[i].reshape(10, 1)
+    xi = x_data[i].reshape(10,)
     yi = y_data[i]
 
-    return 2 * xi * (xi.T.dot(theta.reshape(10, 1))-yi)
+    return 2 * xi * (xi.T.dot(theta.reshape(10,))-yi)
 
 def stochastic_error(theta, i):
     """
@@ -133,10 +134,11 @@ def stochastic_error(theta, i):
 
     where t represents the iteration, and i represents the sample index
     """
-    xiT = x_data[i].reshape(10, 1).T
+    xiT = x_data[i].reshape(10,).T
     yi = y_data[i]
 
-    # print("x {} and y{}".format(xiT, yi))
-    # print("stoch error{}".format((xiT.dot(theta.reshape(10, 1))-yi) ** 2))
-    return (xiT.dot(theta.reshape(10, 1))-yi) ** 2 
+    # print("x {} and y {}".format(xiT, yi))
+    # print("theta {}".format(theta))
+    # print("stoch error{}".format((xiT.dot(theta.reshape(10,))-yi) ** 2))
+    return (xiT.dot(theta.reshape(10,))-yi) ** 2 
 

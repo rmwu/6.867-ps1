@@ -60,15 +60,19 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
         # else:
         #     est_grad = central_difference(objective, current_x, delta)
         # est_slope = np.linalg.norm(est_grad)
+        
         # calculate objective function
-
-        fx1 = objective(current_x)
-        delta_objectives.append(fx1 - fx0)
+        
+        fx1 = sum([objective(current_x, i) for i in range(n)]) if stochastic else objective(current_x)
+        
+        delta_objectives.append(tuple([current_x, fx1, fx1 - fx0]))
+        # delta_objectives.append(fx1 - fx0)
 
         if debug:
-            # print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
-            #     .format(current_norm, current_x, fx1, est_grad))
-            print("Past objective function: {}".format(fx0))
+            print("Gradient norm: {}\nCurrent X: {}\nObjective function: {}\nEstimated next gradient: {}"\
+                 .format(current_norm, current_x, fx1, est_grad))
+            print("Gradient: {}\n".format(grad))
+            print("Past objective function: {}\n".format(fx0))
 
         # check for convergence
         if conv_by_grad and converge_grad(grad, threshold):
@@ -82,7 +86,7 @@ def gradient_descent(x_init, objective, gradient, eta = 0.000001, threshold = 0.
         iterations += 1
 
     print("Converged after {} iterations\n".format(iterations))
-    print("We updated to {}\n".format(current_x))
+    # print("We updated to {}\n".format(current_x))
 
     return (current_x, fx1, iterations, grad_norms, delta_objectives)
 
@@ -101,7 +105,7 @@ def update(gradient, x, eta, i = None, t = None):
     if i is not None:
         assert t is not None
         grad = gradient(x, i)
-        step = (eta + t) ** (-0.6) # adjust learning rate
+        # step = (eta + t) ** (-0.6) # adjust learning rate
         # print("eta={}\n\n".format(step))
     else:
         grad = gradient(x)

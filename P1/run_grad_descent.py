@@ -27,10 +27,10 @@ def simple_gradient_descent(is_gaussian, conv_by_grad, eta, threshold, delta = 0
     objective = negative_gaussian if is_gaussian else quadratic_bowl
     gradient = d_negative_gaussian if is_gaussian else d_quadratic_bowl
 
-    verify_gradient(objective, gradient, 1e-8)
+    # verify_gradient(objective, gradient, 1e-8)
 
     if starting_guess is None:
-        starting_guess = np.array([[0], [0]])
+        starting_guess = np.array([9,9])
 
     return gradient_descent(starting_guess, objective, gradient, 
                      eta, threshold, delta, conv_by_grad)
@@ -39,20 +39,20 @@ def test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     """
     omg it converged for eta = 0.000001
     """
-    theta_init = np.array([0 for i in range(10)]).reshape(10, 1)
+    theta_init = np.array([-5.2 for i in range(10)]).reshape(10,)
 
-    verify_gradient(squared_error, d_squared_error, 1e-8)
+    # verify_gradient(squared_error, d_squared_error, 1e-8)
 
     return gradient_descent(theta_init, squared_error, d_squared_error,
                     eta, threshold, delta, conv_by_grad)
 
 def test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     """
-    doesn't work
+    eta 0.0001 threshold 0.05 sighhhh
     """
-    theta_init = np.array([-5.3 for i in range(10)]).reshape(10, 1)
+    theta_init = np.array([-5.2 for i in range(10)]).reshape(10,)
 
-    verify_gradient(stochastic_error, d_stochastic_error, 1e-8)
+    # verify_gradient(stochastic_error, d_stochastic_error, 1e-8, True)
 
     return gradient_descent(theta_init, stochastic_error, d_stochastic_error,
                     eta, threshold, delta, conv_by_grad, True)
@@ -66,15 +66,19 @@ def test_verify_gradient():
 # Numerical analysis
 ##################################
 
-def verify_gradient(objective, gradient, delta):
+def verify_gradient(objective, gradient, delta, stoch = False):
     """
     Verifies the our gradient function.
     """
     dimensions = 10
     weight_vector = np.random.rand(dimensions)
-
-    approx_grad = central_difference(objective, weight_vector, delta)
-    exact_grad = gradient(weight_vector)
+    if stoch: 
+        stochInd = np.random.randint(dimensions)
+        approx_grad = central_difference(objective, weight_vector, delta, stochInd)
+        exact_grad = gradient(weight_vector, stochInd)
+    else:
+        approx_grad = central_difference(objective, weight_vector, delta)
+        exact_grad = gradient(weight_vector)
 
     grad_err = approx_grad - exact_grad
     mse = grad_err.T.dot(grad_err).mean()
@@ -105,7 +109,7 @@ def main():
     eta, threshold = float(eta), float(threshold)
 
     is_gaussian = False
-    conv_by_grad = False
+    conv_by_grad = True
 
     plot = False
     if len(sys.argv) == 5 and sys.argv[4] == "plot":
