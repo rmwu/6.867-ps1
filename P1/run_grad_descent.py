@@ -41,10 +41,10 @@ def test_batch_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     """
     theta_init = np.array([-5.2 for i in range(10)]).reshape(10,)
 
-    # verify_gradient(squared_error, d_squared_error, 1e-8)
+    verify_gradient(squared_error, d_squared_error, 1e-8)
 
-    return gradient_descent(theta_init, squared_error, d_squared_error,
-                    eta, threshold, delta, conv_by_grad)
+    # return gradient_descent(theta_init, squared_error, d_squared_error,
+    #                eta, threshold, delta, conv_by_grad)
 
 def test_stochastic_gradient_descent(conv_by_grad, eta, threshold, delta = 0.05):
     """
