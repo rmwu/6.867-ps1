@@ -1,15 +1,18 @@
 %\documentclass{amsart}
 
 \documentclass{article}
-\usepackage[letterpaper,hmargin=15mm,vmargin=20mm]{geometry}
-\usepackage[nosetup]{tony}
+\usepackage[a4paper,hmargin=15mm,vmargin=20mm]{geometry}
+\usepackage[nosetup, colorlinks]{tony}
 \usepackage{graphicx}
 
 \usepackage{mathpazo}
+\usepackage{amsmath}
 \usepackage{multicol}
+\usepackage{diagbox}
 
 
 \title{6.867: Problem Set 1}
+\author{Benjamin Bitdiddle, and Hacker, A.}
 \date{September 29, 2016}
 
 \begin{document}
@@ -33,7 +36,7 @@
 We implemented a general-purpose batch gradient descent as described in Bishop 5.2.4, with user-specified objective function and gradient thereof, initial guess, step size, and termination criterion. % TODO elaborate on this?
 We tested our implementation against two functions: a sign-reversed multivariate Gaussian with mean~$\mu$ and covariance matrix~$\Sigma$
 \begin{equation}
-f(x; \mu, \Sigma) = -\frac{1}{\sqrt{(2\pi)^n \det\Sigma}}\exp\left( -\frac12(x - \mu)^T \Sigma^{-1}(x - \mu) \right)
+f(x; \mu, \Sigma) = -\frac{e^{-\frac12(x - \mu)^T \Sigma^{-1}(x - \mu)}}{\sqrt{(2\pi)^n \det\Sigma}}
 \end{equation}
 and a quadratic bowl
 \begin{equation}
@@ -137,7 +140,7 @@ In other words, we transform the independent variable $x$ by basis functions~$\p
 We wrote a procedure for general linear basis function regression with user-specified data points and basis functions that found the maximum-likelihood weight vector analytically, via Bishop Equation 3.15, which we restate here:
 \begin{equation}
 \label{eq:max-likelihood-weights}
-w = (\Phi^T\Phi)\inv\Phi^T Y
+w_\tx{ml} = (\Phi^T\Phi)\inv\Phi^T Y
 \end{equation}
 where $Y$ is a vector of $y^{(n)}$ values from our dataset and $\Phi$ is the design matrix, given by
 \begin{equation}
@@ -152,7 +155,6 @@ We tested our procedure by performing fits on a dataset of 11 points with polyno
 y(x) = \cos(\pi x) + \cos(2\pi x).
 \end{equation}
 We plot the results of these fits for varying values of degree~$M$ in Figure~\ref{fig:2.1-polybasis}. Note the obvious underfitting and overfitting introduced by using models with excessively low or high degrees.
-\end{multicols}
 
 \begin{figure*} %  figure placement: here, top, bottom, or page
    \centering
@@ -165,16 +167,15 @@ We plot the results of these fits for varying values of degree~$M$ in Figure~\re
    \label{fig:2.1-polybasis}
 \end{figure*}
 
-\begin{multicols}{2}
 \subsection{Regression by Gradient Descent}
 
 Though there is a closed-form formula for the best-fit weight vector (Equation~\ref{eq:max-likelihood-weights}), we decided to verify our results from the previous section through gradient descent.
 
 To this end, we considered the sum-of-squares error (SSE) for our problem:
-\beq
-\label{eq:sse}
-J(w) = \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2 = \f12 (\Phi w - Y)^T(\Phi w - Y),
-\eeq
+\begin{align*}
+J(w) &= \f12 \sum_n \lt(y^{(n)} - \sum_j\phi_j(x^{(n)}) w_j\rt)^2 \\
+&= \f12 (\Phi w - Y)^T(\Phi w - Y), \label{eq:sse}\numberthis
+\end{align*}
 which has gradient
 \beq
 \label{eq:sse-grad}
@@ -182,17 +183,15 @@ which has gradient
 \eeq
 Using our numeric gradient approximation from section~\ref{subsec:grad-approx} (Equation~\ref{eq:grad-approx}), we verified the correctness of Equation~\ref{eq:sse-grad}.
 
-We proceeded to estimate the maximmum-likelihood weight vector $w$ (Equation~\ref{eq:max-likelihood-weights}) using batch gradient descent on the SSE.
+We proceeded to estimate the maximmum-likelihood weight vector $w_\tx{ml}$ (Equation~\ref{eq:max-likelihood-weights}), which minimizes $J(w)$, using batch gradient descent on the SSE.
 For small degree fits, the results agreed strongly with the closed-form solution.
 However, for higher degrees, the discrepancies between our maximum-likelihood fits and our gradient-descent estimate fits grew progressively larger (Figure~\ref{fig:bgd-poly-fits}).
-\end{multicols}
 
 \begin{figure*}[h]
    \centering
-   \includegraphics[width=3in]{img/2-3_bgd_fit_degree1.pdf}
-   \includegraphics[width=3in]{img/2-3_bgd_fit_degree4.pdf}
-   \includegraphics[width=3in]{img/2-3_bgd_fit_degree7.pdf}
-   \includegraphics[width=3in]{img/2-3_bgd_fit_degree10.pdf}
+   \includegraphics[width=2in]{img/2-3_bgd_fit_degree1.pdf}
+   \includegraphics[width=2in]{img/2-3_bgd_fit_degree4.pdf}
+   \includegraphics[width=2in]{img/2-3_bgd_fit_degree7.pdf}
    \caption{Polynomial fits of various degrees by batch gradient descent (green) of the dataset (blue) generated from a sum of cosines (yellow).
    The fits agree perfectly with the maximum-likelihood fits (red) at low degrees, but differ increasingly for higher degrees.
    Weights were initialized to zero.
@@ -200,7 +199,6 @@ However, for higher degrees, the discrepancies between our maximum-likelihood fi
    \label{fig:bgd-poly-fits}
 \end{figure*}
 
-\begin{multicols}{2}
 Interestingly, the gradient descent fits did not overfit nearly as much as the maximum-likelihood fits at high degree.
 We conjecture that this behavior arises because we initialize our weight vectors at 0, ``regularizing" our fits in a sense.
 Indeed, initializing our weight vectors to very large (in absolute value) random numbers produced wildly varying polynomials as fits.
@@ -235,41 +233,101 @@ With a fit degree of~8, however, we overfitted significantly, and our weight vec
 
 \section{Ridge Regression}
 
-Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modified version of Equation~\ref{eq:sse}:
+Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modified version of Equation~\ref{eq:sse} (Bishop Equation~3.27):
 \begin{equation}
-J(w) = \f12 (\phi w - Y)^T (\phi w - Y) + \lambda ||w_+||^2,
+J(w) = \f12 (\Phi w - Y)^T (\Phi w - Y) + \f12 \lambda ||w_+||^2,
 \end{equation}
-where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization.
+where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. So now we are penalizing large weights.
+
+Then it can be shown that the optimal weight vector is given by
+\begin{equation}
+\label{eq:ridge-weights}
+w_{+,\tx{ridge}} = (\lambda I + Z^T Z)\inv Z^T Y_c
+\end{equation}
+where $Z=\Phi - \overline\Phi$, where $\Phi$ is taken with \emph{no} column of 1's, and where $\overline\Phi$ is the average of all rows of $\Phi$ (an average of data points); and where $Y_c$ is $Y - \bar Y$, where $\bar Y$ is the mean of $Y$; and bias term
+\begin{equation}
+\label{eq:ridge-bias}
+w_{0, \tx{ridge}} = \overline Y - w_{+,\tx{ridge}}^T \overline \Phi
+\end{equation}
+
 
 We implemented ridge regression and tested it on the data from our previous experiments on regression for a variety of polynomial degrees and values of $\lambda$. We present some of the fits in Figure~\ref{fig:ridge}.
 
 \begin{figure*}[p] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree1.pdf}
-   \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree2.pdf}
-   \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree3.pdf}
-   \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree6.pdf}
    \includegraphics[width=3in]{img/3-1_ridge_lambd30_degree1.pdf}
-   \includegraphics[width=3in]{img/3-1_ridge_lambd30_degree2.pdf}
+   \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree3.pdf}
    \includegraphics[width=3in]{img/3-1_ridge_lambd30_degree3.pdf}
+   \includegraphics[width=3in]{img/3-1_ridge_lambd3_degree6.pdf}
    \includegraphics[width=3in]{img/3-1_ridge_lambd30_degree6.pdf}
    \caption{Regularized (green) and non-regularized (red) polynomial fits for the dataset from the previous section.}
    \label{fig:ridge}
 \end{figure*}
 
-We observe that when fitting with higher order polynomial bases, even small values of $\lambda$ can drastically reduce overfitting. In general, at all degrees, the $\lambda$.
-
-% Experiment with different values of ? on the simple data from the previous question (curvefittingp2.txt), for various values of M. Describe your observations.
+Note that when fitting with higher order polynomial bases, even small values of $\lambda$ can drastically reduce overfitting. In general, at all degrees, larger values of $\lambda$ ``smooths" out and slightly ``flattens" our fit. Indeed, in the linear case, larger values of $\lambda$ would decrease the weight, i.e. the slope of our regression line.
 
 
+\subsection{Model Selection}
 
-% #PLACEHOLDER
+We now turn our attention to another dataset, again of pairs of real numbers. This dataset has already been partitioned into sets $A$, $B$, and $V$, with respective sizes 13, 10, and 22. We will use $V$ as our validation set. We will try to model this data with a polynomial fit, as before, except we will be using regularization.
 
-rem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum l
+We used $A$ as training data and $B$ as test data, then vice versa.
+In each case, we found the optimal weights using Equations~\ref{eq:ridge-weights} and \ref{eq:ridge-bias} on the training data for many values of the degree $M$ of the polynomial basis and the regularization parameter $\lambda$. We picked the pair $(M^*, \lambda^*)$ that produced the weight vector with the best performance on the \emph{validation} data, then evaluated the model they produced on the test data.
+Note that we evaluate performance of an actual weight vector with ordinary mean-square error (MSE; Equation~\ref{eq:sse}, but normalized by the number of data points), with \emph{no regularization term}.
 
-orem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+We present validation errors for a variety of $M$ and $\lambda$ in Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b}.
+When we trained on $A$ and tested on $B$, the hyperparameters that produced the smallest MSE on validation were $(M^*,\lambda^*)=(2,0)$; the MSE was $0.05336$. On test data $B$, the same model achieved an MSE of $1.28765$.
+When we trained on $B$ and test on $A$, the best hyperparameters $(M^*,\lambda^*)=(3,0.6)$ produced a validation error of $0.65195$. The test error on the same model was $1.51697$.
+We plot these two best-fit models in Figure~\ref{fig:3-2-bestfit}.
 
 
+\begin{table*}
+\caption{Mean-square error on our validation set after training on $A$. The optimal pair of hyperparameters was $(M^*,\lambda^*) = (2, 0)$.}
+\centering
+\begin{tabular}{|l||c|c|c|c|c|c|}
+\hline
+\backslashbox{$\lambda$}{$M$} & 0		& 1		 & 2	   & 3 & 4 & 5 \\\hline
+0		& 1.40909 & 0.06584 & {\color{red}0.05336} & 0.05386 &  0.08134  & 0.09403\\
+0.001	& " & 0.06584 & 0.05336 & 0.05388 &0.08129& 0.09393\\
+0.003	& " & 0.06585 & 0.05337 & 0.05392 &0.08119& 0.09373\\
+0.01	& " & 0.06587 & 0.05339 & 0.05407 &0.08086& 0.09305\\
+0.03	& " & 0.06596 & 0.05345 & 0.05450 &0.07998& 0.09120\\
+0.1		& " & 0.06624 & 0.05366 & 0.05600 &0.07747& 0.08564\\\hline
+\end{tabular}
+\label{tab:val-mse-a}
+\end{table*}
+
+\begin{table*}
+\caption{Analogous to Table~\ref{tab:val-mse-a}, except with training on $B$. The best hyperparameters are $(M^*,\lambda^*)=(3,0.6)$.}
+\centering
+\begin{tabular}{|l||c|c|c|c|c|c|}
+\hline
+\backslashbox{$\lambda$}{$M$}&
+0		& 1		 & 2	   & 3 & 4 & 5 \\\hline
+0		& 1.64635 & 0.79978 & 0.87563 & 0.68864 &  2.95901  & 14.21443\\
+%0.001	& " & 0.79981 & 0.87562 & 0.68843 & 2.95298 & 14.17389\\
+%0.003	& " & 0.79987 & 0.87560 & 0.68801 & 2.94101 & 14.09364\\
+%0.01	& " & 0.80008 & 0.87553 & 0.68656 & 2.89993 & 13.82113\\
+0.03	& " & 0.80066 & 0.87533 & 0.68262 & 2.78933 & 13.10785\\
+0.1		& " & 0.80271 & 0.87471 & 0.67110 & 2.46809 & 11.18677\\
+0.3		& " & 0.80852 & 0.87347 & 0.65314 & 1.90417 & 8.20467\\
+0.6		& " & 0.81709 & 0.87289 & \color{red}0.65195 & 1.51048 & 6.18385\\
+1.0		& " & 0.82828 & 0.87410 & 0.67289 & 1.29261 & 4.82707
+\\\hline
+\end{tabular}
+\label{tab:val-mse-b}
+\end{table*}
+
+\begin{figure*}
+   \centering
+   \includegraphics[width=3in]{img/3-2_lambda0_degree2.pdf} 
+   \includegraphics[width=3in]{img/3-2_lambda6_degree3.pdf} 
+   \caption{Best fit models for our dataset, where $A$ is plotted with blue dots, $B$ with green crosses, and $V$ with small plus signs. Note how the single outlier in $B$ skews the second fit significantly.}
+   \label{fig:3-2-bestfit}
+\end{figure*}
+
+Before concluding this section, we observe from Tables~\ref{tab:val-mse-a} and \ref{tab:val-mse-b} that increasing the degrees of freedom in our model increases the optimal value of $\lambda$.
 
 
 % % % % % % % % % %
@@ -283,18 +341,6 @@ lorem ipsum lorem ipsum lorem ip
 
 sum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ip
 
-sum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lo
-
-lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lore
-
-m ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem 
-
-
- lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ip
- sum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum l
- 
- orem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem i
- psum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum  
 \end{multicols}
 
 \end{document}
