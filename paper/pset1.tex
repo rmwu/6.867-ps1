@@ -39,7 +39,7 @@ and a quadratic bowl
 \begin{equation}
 f(x; A, b) = \frac{1}{2}x^T Ax - x^T b,
 \end{equation}
-where $A$ is positive-definite. For this exercise, our Gaussian was tested with $\mu = (10, 10)^T$, $\Sigma = 1000 \cdot I_2$. For the quadratic bowl, we took $A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)$ and $b = (400, 400)^T$. Figure \ref{fig:1.1} illustrates the effect of the initial guess and step size for convergence given these values.
+where $A$ is positive-definite. For this exercise, our Gaussian was tested with $\mu = (10, 10)^T$, $\Sigma = 1000 \cdot I_2$. For the quadratic bowl, we took \[A = \left(\begin{array}{cc}10 & 5 \\5 & 10\end{array}\right)\] and $b = (400, 400)^T$. Figure \ref{fig:1.1} illustrates the effect of the initial guess and step size for convergence given these values.
 
 \begin{figure*}%  figure placement: here, top, bottom, or page
    \centering
@@ -86,20 +86,18 @@ where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i
 % TODO
 % "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
 
-We note that decreasing the difference step increases the accuracy of the gradient evaluation, until round-off errors again decrease said accuracy.
-
+We note that decreasing the difference step produces a most accurate guess when it is relatively close in order of magnitude to the points of interest.
 
 % this damn table disappears
-\begin{table}[t]
-\caption{default}
+
 \begin{center}
-\begin{tabular}{ccccc}
-$\epsilon$ & 1000 & 100 & 10 & 1e-4 \\
-MSE & 2.0e-17 & 1.4e-18 & 3.8e-18 & 2.1e-12
+\begin{tabular}{|c|c|c|c|c|}\hline
+\label{tab:1.2}
+$\epsilon$ & 1000 & 100 & 10 & 1e-4 \\ \hline
+MSE & 2.0e-17 & 1.4e-18 & 3.8e-18 & 2.1e-12 \\
+ \hline
 \end{tabular}
 \end{center}
-\label{tab:1.2}
-\end{table}%
 
 \subsection{Stochastic Gradient Descent}
 
