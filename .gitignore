@@ -23,7 +23,8 @@
 # these rules might exclude image files for figures etc.
 # *.ps
 # *.eps
-*.pdf
-!paper/img/*.pdf
+# *.pdf
+# !paper/img/*.pdf
+paper/*.pdf
 **out.txt
 **play
