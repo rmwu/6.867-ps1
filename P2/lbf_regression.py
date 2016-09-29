@@ -48,6 +48,7 @@ def basis_fit_plot(X, Y, basis_functions, x_arange, **kwargs):
     print("maximum likelihood weights for basis\n{}\n".format(max_likelihood_weights))
     y_fit_values = x_arange_design_matrix.dot(max_likelihood_weights)
     plt.plot(x_arange, y_fit_values, **kwargs)
+    return max_likelihood_weights
 
 
 def design_matrix(basis_functions, X):
@@ -75,12 +76,13 @@ def visualize(fit_degree, poly_basis):
     # plot the fit
     fit_kwargs = {"color": 'r', "lw": 2}
     basis_functions = power_basis(fit_degree) if poly_basis else cosine_basis(fit_degree)
-    basis_fit_plot(X, Y, basis_functions, x_arange, **fit_kwargs)
+    max_likelihood_weights = basis_fit_plot(X, Y, basis_functions, x_arange, **fit_kwargs)
 
     # nice setup
     plt.xlabel('$x$')
     plt.ylabel('$y$')
     plt.show()
+    return max_likelihood_weights
 
 
 def main():
