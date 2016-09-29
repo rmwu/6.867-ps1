@@ -76,31 +76,31 @@ where $A$ is positive-definite. For this exercise, our Gaussian was tested with 
 \subsection{Numerical Gradient Approximation}
 \label{subsec:grad-approx}
 
-Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. With our examples, these gradients had simple analyic forms, but such is not the case for general objective functions. Therefore, as a check on the user-specified gradient (or as a substitute for a user-specified gradient), we implemented a gradient approximation routine.
+Recall that our gradient descent procedure requires the user to specify both the objective function \emph{and} its gradient. With our examples, these gradients had simple analytic forms, but such is not the case for general objective functions. Therefore, as a check on (or a substitute for) the user-specified gradient, we implemented a gradient approximation routine.
 
-Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at some given point~$x^*$ by approximating its partial derivatives as
+Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at some given point~$x^*$ by approximating its partial derivatives as the central difference
 \begin{equation}
 \label{eq:grad-approx}
 \f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
 \end{equation}
-where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the values into our numerical gradient approximation. 
+where $\eps > 0$ is some user-supplied small difference step and $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the terms into our numerical gradient approximation. 
 
 % #PLACEHOLDER
 % TODO
 % "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
 
-We note that decreasing the difference step produces a most accurate guess when it is relatively close in order of magnitude to the points of interest.
+Numerically we noted that the difference step produced the best guess when it was relatively close in order of magnitude to the points of interest. Too small a step resulted in rounding inaccuracies, while too large a step overstretched the assumption that the function could be approximated by a hyperplane at the point.
 
 % this damn table disappears
 
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|}\hline
-\label{tab:1.2}
-$\epsilon$ & 1000 & 100 & 10 & 1e-4 \\ \hline
-MSE & 2.0e-17 & 1.4e-18 & 3.8e-18 & 2.1e-12 \\
- \hline
-\end{tabular}
-\end{center}
+%\begin{center}
+%\begin{tabular}{|c|c|c|c|c|}\hline
+%\label{tab:1.2}
+%$\epsilon$ & 1000 & 100 & 10 & 1e-4 \\ \hline
+%MSE & 2.0e-17 & 1.4e-18 & 3.8e-18 & 2.1e-12 \\
+% \hline
+%\end{tabular}
+%\end{center}
 
 \subsection{Stochastic Gradient Descent}
 
@@ -234,7 +234,7 @@ With a fit degree of~8, however, we overfitted significantly, and our weight vec
 \section{Ridge Regression}
 
 Recall that ridge regression is just linear regression, with an $L^2$ regularization term added to the loss function. That is, our error is the following modified version of Equation~\ref{eq:sse} (Bishop Equation~3.27):
-\begin{equation}
+\begin{equation}\label{eq:moderr}
 J(w) = \f12 (\Phi w - Y)^T (\Phi w - Y) + \f12 \lambda ||w_+||^2,
 \end{equation}
 where $w_+$ is the vector of weights $w$ \emph{without} the bias term and $\lambda\ge 0$ controls the strength of regularization. So now we are penalizing large weights.
@@ -337,9 +337,16 @@ Before concluding this section, we observe from Tables~\ref{tab:val-mse-a} and \
 \section{Sparsification with LASSO}
 
 % #PLACEHOLDER
-lorem ipsum lorem ipsum lorem ip
+In previous parts, we have encountered relatively simple closed-form answers. However, that is not always the case; for problems without such solutions, we may estimate sparse weights with the LASSO (least absolute shrinkage and selection operation) method.
 
-sum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ip
+Recall that in ridge regression, we modified our error to include a quadratic regularizer. A more generalized form of Equation \ref{eq:moderr} (Bishop 3.29) can be extended to other exponents. In particular, when exponent $q=1$, we have the LASSO error function:
+\begin{equation}J(w) = \f{1}{n}\sum_{i=1}^n{(y^{(i)}-w^T\phi(x^{(i)}))^2} + \lambda \sum_{j=1}^M{|w_j|}.\end{equation}
+
+We implemented LASSO for basis given by
+\begin{equation}\phi(x)=(x, \sin{(0.4\pi x\cdot1)},\dots,\sin{0.4\pi x\cdot 12})\in \mathbb{R}^{13}
+\end{equation}
+We compared its performance with that of ridge regression and observed that sparsity increases and some coefficients $w_j$ are driven to 0 as $\lambda$ increases. This is because, we are subject to the following constraint when minimizing the error function (Bishop 3.30):
+\begin{equation}\sum_{j=1}^M{|w_j|} \le \eta.\end{equation}
 
 \end{multicols}
 
