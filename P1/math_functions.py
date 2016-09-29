@@ -14,21 +14,21 @@ import loadParametersP1 as loadParams
 
 def get_gaussian_params():
     mu, sigma = loadParams.getData()[:2]
-    mu = np.array(mu).reshape(2, 1)
+    mu = np.array(mu).reshape(2)
     sigma = np.array(sigma)
 
     return (mu, sigma)
 
 def get_quad_params():
     a, b = loadParams.getData()[2:4]
-    b = np.array(b).reshape(2, 1)
+    b = np.array(b).reshape(2)
     a = np.array(a)
 
     return (a, b)
 
 def get_data():
     x, y = loadData.getData()
-    x, y = np.array(x).reshape(100, 10), np.array(y).reshape(100, 1)
+    x, y = np.array(x).reshape(100, 10), np.array(y).reshape(100)
     return (x, y)
 
 mu, sigma = get_gaussian_params()

@@ -1,0 +1,54 @@
+colors = ["r", "b", "g", "o"]
+
+
+##################################
+# VARY ETA
+##################################
+
+etas = [1e-2, 1e-3, 1e-4] # eta
+threshold = 1e-3 # convergence threshold
+is_gaussian = False # quad bowl
+conv_by_grad = False # converge by change in objective
+
+Converged after 46 iterations
+
+We updated to [[ 26.65382391]
+ [ 26.65382391]]
+
+Converged after 420 iterations
+
+We updated to [[ 26.62068108]
+ [ 26.62068108]]
+
+Converged after 3455 iterations
+
+We updated to [[ 26.51776625]
+ [ 26.51776625]]
+
+
+##################################
+# VARY STARTING GUESS
+##################################
+
+eta = 1e-2
+    threshold = 1e-1 # convergence threshold
+    is_gaussian = False # quad bowl
+    conv_by_grad = True # converge by change in objective
+    guesses = [ np.array([[26], [26]]),
+                np.array([[-100], [-100]]),
+                np.array([[100], [100]])]
+
+Converged after 31 iterations
+
+We updated to [[ 26.66299118]
+ [ 26.66299118]]
+
+Converged after 63 iterations
+
+We updated to [[ 26.66281655]
+ [ 26.66281655]]
+
+Converged after 60 iterations
+
+We updated to [[ 26.67029624]
+ [ 26.67029624]]

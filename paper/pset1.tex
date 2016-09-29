@@ -52,12 +52,13 @@ Our procedure approximates the gradient of a general function~$f:\RR^d\to\RR$ at
 \begin{equation}
 \f{\pa f}{\pa x_i}(x^*) \approx \f{f(x^* + \f12\eps\hat x_i) - f(x^* - \f12 \eps\hat x_i)}{\eps},
 \end{equation}
-where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the values into our numerical gradient approximation.
+where $\eps > 0$ is some user-supplied small difference step and where $\hat x_i$ is the unit vector in the $x_i$ direction. We compute this approximate partial derivative along each dimension of our domain and collect the values into our numerical gradient approximation. 
 
 % #PLACEHOLDER
 % TODO
 % "Verify the gradient values on the functions you used in the question above by comparing the closed-form and numerical gradients at various points. Discuss the effect of changing the difference step (or "delta") on the accuracy of the gradient evaluation."
 
+We note that decreasing the difference step increases the accuracy of the gradient evaluation, until round-off errors again decrease said accuracy around [todo].
 
 \subsection{Stochastic Gradient Descent}
 
