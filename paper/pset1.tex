@@ -114,15 +114,13 @@ where each $J_i$ is presumably a term corresponding to a single data point. Wher
 the SGD update step has the form
 \begin{equation} \theta_{t+1} = \theta_t - \eta_t \nabla J_i(\theta_t). \end{equation}
 
-Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while SGD fluctuates during convergence, it eventually does converge, like GBD.
+Note two key differences. We take $\nabla J_i$ as an approximation of $\nabla J$. More interestingly, our step size is now time-dependent. Because SGD is stochastic, it is unclear that SGD converges. But it can be shown that if we choose a learning rate schedule $\eta_t$ satisfying the Robbins-Monro conditions ($\sum_{t=1}^\infty \eta_t$ diverges and $\sum_{t=1}^\infty \eta_t^2$ converges), we get guaranteed convergence. Figure \ref{fig:1.2} illustrates that while SGD fluctuates during convergence, it eventually does converge, like BGD.
 
-In this case, we 
+We implemented two stopping criteria: either gradient norm or change in objective function drop below a provided threshold. For these problems, we mostly utilized change in objective function.
 % #PLACEHOLDER
 % TODO describe specific problem
 % TODO talk about learning rate schedule and stopping criterion we chose for specific problem
 % TODO part 1c
-
-rem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum 
 
 
 
